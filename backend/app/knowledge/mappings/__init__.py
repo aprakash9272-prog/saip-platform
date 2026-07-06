@@ -1,0 +1,1 @@
+"""Mappings knowledge namespace."""
