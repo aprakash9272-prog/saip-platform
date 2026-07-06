@@ -1,0 +1,90 @@
+- name: Data Loss Prevention (DLP)
+  code: DAT-001
+  domain: Data Security & Privacy
+  description: Detects and blocks unauthorized exfiltration of sensitive data.
+  risk_category: Critical
+- name: Data Classification & Labeling
+  code: DAT-002
+  domain: Data Security & Privacy
+  description: Identifies and tags data according to sensitivity level.
+  risk_category: High
+- name: Data Encryption at Rest
+  code: DAT-003
+  domain: Data Security & Privacy
+  description: Encrypts stored data to protect it from unauthorized disclosure.
+  risk_category: Critical
+- name: Data Encryption in Transit
+  code: DAT-004
+  domain: Data Security & Privacy
+  description: Encrypts data as it moves across networks.
+  risk_category: High
+- name: Database Activity Monitoring (DAM)
+  code: DAT-005
+  domain: Data Security & Privacy
+  description: Monitors and audits database queries and administrative actions.
+  risk_category: Critical
+- name: Tokenization
+  code: DAT-006
+  domain: Data Security & Privacy
+  description: Replaces sensitive data with non-sensitive tokens for storage or processing.
+  risk_category: High
+- name: Data Masking / Anonymization
+  code: DAT-007
+  domain: Data Security & Privacy
+  description: Obscures sensitive data values while preserving usability for testing/analytics.
+  risk_category: Medium
+- name: Data Discovery & Inventory
+  code: DAT-008
+  domain: Data Security & Privacy
+  description: Locates and catalogs sensitive data across the environment.
+  risk_category: Medium
+- name: Privacy Impact Assessment Tooling
+  code: DAT-009
+  domain: Data Security & Privacy
+  description: Supports structured assessment of privacy risk for new initiatives.
+  risk_category: Medium
+- name: Consent Management
+  code: DAT-010
+  domain: Data Security & Privacy
+  description: Captures and enforces user consent preferences for data processing.
+  risk_category: Medium
+- name: Data Retention & Disposal Management
+  code: DAT-011
+  domain: Data Security & Privacy
+  description: Enforces retention schedules and secure disposal of data.
+  risk_category: Medium
+- name: Data Access Governance
+  code: DAT-012
+  domain: Data Security & Privacy
+  description: Governs and audits who can access sensitive datasets.
+  risk_category: Medium
+- name: Rights Management (Digital Rights / IRM)
+  code: DAT-013
+  domain: Data Security & Privacy
+  description: Persistently protects documents and enforces usage rights.
+  risk_category: Medium
+- name: Data Residency & Sovereignty Controls
+  code: DAT-014
+  domain: Data Security & Privacy
+  description: Ensures data is stored and processed within required jurisdictions.
+  risk_category: Low
+- name: Data Breach Detection
+  code: DAT-015
+  domain: Data Security & Privacy
+  description: Detects indicators of unauthorized access to sensitive datasets.
+  risk_category: Medium
+- name: Backup Data Encryption
+  code: DAT-016
+  domain: Data Security & Privacy
+  description: Encrypts backup data to protect it at rest and in transit.
+  risk_category: Low
+- name: Data Sharing & Third-Party Data Exchange Controls
+  code: DAT-017
+  domain: Data Security & Privacy
+  description: Governs secure exchange of data with external parties.
+  risk_category: Medium
+- name: Structured/Unstructured Data Security
+  code: DAT-018
+  domain: Data Security & Privacy
+  description: Applies consistent controls across databases, files, and documents.
+  risk_category: Low

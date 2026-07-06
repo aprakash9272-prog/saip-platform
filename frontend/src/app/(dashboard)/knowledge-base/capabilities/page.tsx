@@ -1,5 +1,5 @@
-import { ResourcePage } from "@/components/knowledge-base/resource-page";
+import { CapabilitiesPage } from "@/components/knowledge-base/capabilities-page";
 
-export default function CapabilitiesPage() {
-  return <ResourcePage resourceKey="capabilities" />;
+export default function CapabilitiesRoute() {
+  return <CapabilitiesPage />;
 }

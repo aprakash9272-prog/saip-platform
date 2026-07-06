@@ -1,0 +1,90 @@
+- name: OT/ICS Network Monitoring
+  code: IOT-001
+  domain: IoT & OT Security
+  description: Monitors industrial control system networks for anomalies and threats.
+  risk_category: Critical
+- name: IoT Device Discovery & Inventory
+  code: IOT-002
+  domain: IoT & OT Security
+  description: Discovers and catalogs connected IoT devices on the network.
+  risk_category: High
+- name: IoT Device Vulnerability Management
+  code: IOT-003
+  domain: IoT & OT Security
+  description: Identifies and tracks vulnerabilities in IoT device fleets.
+  risk_category: Critical
+- name: SCADA Security Monitoring
+  code: IOT-004
+  domain: IoT & OT Security
+  description: Monitors supervisory control and data acquisition systems for threats.
+  risk_category: High
+- name: IoT Network Segmentation
+  code: IOT-005
+  domain: IoT & OT Security
+  description: Isolates IoT devices from critical IT and OT network segments.
+  risk_category: Critical
+- name: Firmware Security Analysis
+  code: IOT-006
+  domain: IoT & OT Security
+  description: Analyzes device firmware for vulnerabilities and backdoors.
+  risk_category: High
+- name: OT Asset Risk Scoring
+  code: IOT-007
+  domain: IoT & OT Security
+  description: Scores operational technology assets by criticality and exposure.
+  risk_category: Medium
+- name: Industrial Protocol Deep Packet Inspection
+  code: IOT-008
+  domain: IoT & OT Security
+  description: Inspects industrial protocol traffic for malicious commands.
+  risk_category: Medium
+- name: IoT Device Identity & Certificate Management
+  code: IOT-009
+  domain: IoT & OT Security
+  description: Manages cryptographic identities for connected devices.
+  risk_category: Medium
+- name: Physical Access Control Systems Security
+  code: IOT-010
+  domain: IoT & OT Security
+  description: Secures badge, biometric, and physical access control systems.
+  risk_category: Medium
+- name: Building Management System Security
+  code: IOT-011
+  domain: IoT & OT Security
+  description: Protects HVAC, lighting, and other building automation systems.
+  risk_category: Medium
+- name: Medical Device Security (IoMT)
+  code: IOT-012
+  domain: IoT & OT Security
+  description: Secures connected medical devices from compromise.
+  risk_category: Medium
+- name: OT Incident Response
+  code: IOT-013
+  domain: IoT & OT Security
+  description: Coordinates incident response tailored to operational technology environments.
+  risk_category: Medium
+- name: IoT/OT Threat Intelligence
+  code: IOT-014
+  domain: IoT & OT Security
+  description: Delivers threat intelligence specific to IoT and OT environments.
+  risk_category: Low
+- name: Remote OT Access Security
+  code: IOT-015
+  domain: IoT & OT Security
+  description: Secures remote vendor and engineer access to OT environments.
+  risk_category: Medium
+- name: Legacy OT System Compensating Controls
+  code: IOT-016
+  domain: IoT & OT Security
+  description: Applies compensating controls where legacy OT cannot be patched.
+  risk_category: Low
+- name: IoT Data Encryption
+  code: IOT-017
+  domain: IoT & OT Security
+  description: Encrypts data generated and transmitted by IoT devices.
+  risk_category: Medium
+- name: Smart Device Configuration Compliance
+  code: IOT-018
+  domain: IoT & OT Security
+  description: Validates connected device configuration against security baselines.
+  risk_category: Low

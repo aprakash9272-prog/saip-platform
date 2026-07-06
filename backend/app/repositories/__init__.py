@@ -1,4 +1,5 @@
 from app.repositories.capability import CapabilityRepository
+from app.repositories.domain import DomainRepository
 from app.repositories.edition import EditionRepository
 from app.repositories.framework import FrameworkRepository
 from app.repositories.framework_mapping import FrameworkMappingRepository
@@ -11,6 +12,7 @@ __all__ = [
     "ProductRepository",
     "EditionRepository",
     "ModuleRepository",
+    "DomainRepository",
     "CapabilityRepository",
     "FrameworkRepository",
     "FrameworkMappingRepository",

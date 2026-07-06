@@ -1,0 +1,92 @@
+- name: Cloud Security Posture Management (CSPM)
+  code: CLD-001
+  domain: Cloud Security
+  description: Continuously assesses cloud configurations against security best practices.
+  risk_category: Critical
+- name: Cloud Workload Protection Platform (CWPP)
+  code: CLD-002
+  domain: Cloud Security
+  description: Protects workloads running on cloud VMs, containers, and serverless.
+  risk_category: High
+- name: Cloud Access Security Broker (CASB)
+  code: CLD-003
+  domain: Cloud Security
+  description: Enforces security policy between users and cloud service providers.
+  risk_category: Critical
+- name: Cloud Infrastructure Entitlement Management (CIEM)
+  code: CLD-004
+  domain: Cloud Security
+  description: Manages and right-sizes permissions across cloud identities.
+  risk_category: High
+- name: Cloud-Native Application Protection Platform (CNAPP)
+  code: CLD-005
+  domain: Cloud Security
+  description: Unifies posture, workload, and entitlement protection for cloud-native
+    apps.
+  risk_category: Critical
+- name: Infrastructure as Code (IaC) Security Scanning
+  code: CLD-006
+  domain: Cloud Security
+  description: Scans IaC templates for misconfigurations before deployment.
+  risk_category: High
+- name: Multi-Cloud Configuration Management
+  code: CLD-007
+  domain: Cloud Security
+  description: Maintains consistent security configuration across multiple cloud providers.
+  risk_category: Medium
+- name: Serverless Security
+  code: CLD-008
+  domain: Cloud Security
+  description: Protects function-as-a-service workloads from runtime threats.
+  risk_category: Medium
+- name: Cloud Storage Security (S3/Blob Protection)
+  code: CLD-009
+  domain: Cloud Security
+  description: Detects misconfigured or exposed cloud storage buckets.
+  risk_category: Medium
+- name: Cloud Detection & Response (CDR)
+  code: CLD-010
+  domain: Cloud Security
+  description: Detects and responds to threats across cloud control and data planes.
+  risk_category: Medium
+- name: Cloud Cost & Shadow IT Discovery
+  code: CLD-011
+  domain: Cloud Security
+  description: Identifies unsanctioned or unmanaged cloud resources and spend.
+  risk_category: Medium
+- name: Cloud Key Management Integration
+  code: CLD-012
+  domain: Cloud Security
+  description: Integrates encryption key management with cloud-native KMS services.
+  risk_category: Medium
+- name: Cloud Network Security Groups Management
+  code: CLD-013
+  domain: Cloud Security
+  description: Manages and audits cloud-native firewall/security group rules.
+  risk_category: Medium
+- name: SaaS Security Posture Management (SSPM)
+  code: CLD-014
+  domain: Cloud Security
+  description: Continuously assesses SaaS application configurations for risk.
+  risk_category: Low
+- name: Cloud Backup & Snapshot Security
+  code: CLD-015
+  domain: Cloud Security
+  description: Protects cloud backups and snapshots from tampering or deletion.
+  risk_category: Medium
+- name: Multi-Tenancy Isolation Controls
+  code: CLD-016
+  domain: Cloud Security
+  description: Ensures logical separation between tenants in shared cloud environments.
+  risk_category: Low
+- name: Cloud Compliance Benchmarking (CIS Benchmarks)
+  code: CLD-017
+  domain: Cloud Security
+  description: Assesses cloud accounts against CIS and similar hardening benchmarks.
+  risk_category: Medium
+- name: Cloud Identity Federation Security
+  code: CLD-018
+  domain: Cloud Security
+  description: Secures trust relationships between cloud IAM and external identity
+    providers.
+  risk_category: Low

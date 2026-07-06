@@ -1,0 +1,92 @@
+- name: Endpoint Detection & Response
+  code: EDR-001
+  domain: Endpoint Security
+  description: Continuous monitoring and automated response to endpoint threats.
+  risk_category: Critical
+- name: Antivirus / Anti-Malware
+  code: END-002
+  domain: Endpoint Security
+  description: Signature and heuristic-based detection and removal of known malware.
+  risk_category: High
+- name: Endpoint Application Control
+  code: END-003
+  domain: Endpoint Security
+  description: Restricts which applications are permitted to execute on endpoints.
+  risk_category: Critical
+- name: Device Control (USB/Removable Media)
+  code: END-004
+  domain: Endpoint Security
+  description: Restricts and monitors use of removable storage and peripherals.
+  risk_category: High
+- name: Endpoint Encryption (Full Disk Encryption)
+  code: END-005
+  domain: Endpoint Security
+  description: Encrypts data at rest on endpoint storage volumes.
+  risk_category: Critical
+- name: Mobile Device Management (MDM)
+  code: END-006
+  domain: Endpoint Security
+  description: Enforces configuration, compliance, and security policy on mobile devices.
+  risk_category: High
+- name: Unified Endpoint Management (UEM)
+  code: END-007
+  domain: Endpoint Security
+  description: Manages desktops, mobile, and IoT endpoints from a single console.
+  risk_category: Medium
+- name: Endpoint Firewall
+  code: END-008
+  domain: Endpoint Security
+  description: Host-based filtering of inbound and outbound network traffic.
+  risk_category: Medium
+- name: Host Intrusion Prevention (HIPS)
+  code: END-009
+  domain: Endpoint Security
+  description: Blocks malicious behavior on the host based on rules or heuristics.
+  risk_category: Medium
+- name: Endpoint Configuration & Patch Compliance
+  code: END-010
+  domain: Endpoint Security
+  description: Verifies endpoints meet configuration and patch-level baselines.
+  risk_category: Medium
+- name: Browser Isolation
+  code: END-011
+  domain: Endpoint Security
+  description: Executes web content in an isolated environment to contain web-borne
+    threats.
+  risk_category: Medium
+- name: Endpoint Forensics
+  code: END-012
+  domain: Endpoint Security
+  description: Collects and analyzes endpoint artifacts to support investigations.
+  risk_category: Medium
+- name: USB/Peripheral Threat Protection
+  code: END-013
+  domain: Endpoint Security
+  description: Detects and blocks malicious peripheral devices (e.g. BadUSB).
+  risk_category: Medium
+- name: Ransomware Protection
+  code: END-014
+  domain: Endpoint Security
+  description: Behavioral detection and rollback capabilities targeting ransomware
+    activity.
+  risk_category: Low
+- name: Endpoint Vulnerability Assessment
+  code: END-015
+  domain: Endpoint Security
+  description: Identifies missing patches and vulnerable software on endpoints.
+  risk_category: Medium
+- name: Application Whitelisting
+  code: END-016
+  domain: Endpoint Security
+  description: Allows only explicitly approved applications to run.
+  risk_category: Low
+- name: Endpoint Threat Hunting
+  code: END-017
+  domain: Endpoint Security
+  description: Proactive search for hidden threats across the endpoint fleet.
+  risk_category: Medium
+- name: Legacy/OS Hardening
+  code: END-018
+  domain: Endpoint Security
+  description: Applies secure configuration baselines to reduce endpoint attack surface.
+  risk_category: Low

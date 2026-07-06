@@ -1,0 +1,90 @@
+- name: Security Information & Event Management (SIEM)
+  code: SOC-001
+  domain: Security Operations & Incident Response
+  description: Aggregates and correlates security logs and events for detection.
+  risk_category: Critical
+- name: Security Orchestration, Automation & Response (SOAR)
+  code: SOC-002
+  domain: Security Operations & Incident Response
+  description: Automates and orchestrates incident response workflows.
+  risk_category: High
+- name: Extended Detection & Response (XDR)
+  code: SOC-003
+  domain: Security Operations & Incident Response
+  description: Correlates telemetry across endpoint, network, and cloud for detection.
+  risk_category: Critical
+- name: Incident Response Case Management
+  code: SOC-004
+  domain: Security Operations & Incident Response
+  description: Tracks and coordinates incident investigation and remediation activity.
+  risk_category: High
+- name: Digital Forensics
+  code: SOC-005
+  domain: Security Operations & Incident Response
+  description: Collects and analyzes digital evidence to support investigations.
+  risk_category: Critical
+- name: Threat Hunting Platform
+  code: SOC-006
+  domain: Security Operations & Incident Response
+  description: Provides tooling for proactive, hypothesis-driven threat hunting.
+  risk_category: High
+- name: Log Management & Retention
+  code: SOC-007
+  domain: Security Operations & Incident Response
+  description: Collects, stores, and retains logs for detection and compliance.
+  risk_category: Medium
+- name: User & Entity Behavior Analytics (UEBA)
+  code: SOC-008
+  domain: Security Operations & Incident Response
+  description: Detects anomalous behavior by users and entities using baselines.
+  risk_category: Medium
+- name: Security Alert Triage & Prioritization
+  code: SOC-009
+  domain: Security Operations & Incident Response
+  description: Ranks and routes alerts based on severity and context.
+  risk_category: Medium
+- name: Playbook Automation
+  code: SOC-010
+  domain: Security Operations & Incident Response
+  description: Codifies and automates standard incident response procedures.
+  risk_category: Medium
+- name: Breach & Attack Simulation
+  code: SOC-011
+  domain: Security Operations & Incident Response
+  description: Continuously simulates attacks to validate detection and response controls.
+  risk_category: Medium
+- name: Purple Team / Adversary Emulation
+  code: SOC-012
+  domain: Security Operations & Incident Response
+  description: Combines offensive and defensive teams to test and improve detection.
+  risk_category: Medium
+- name: Tabletop Exercise Management
+  code: SOC-013
+  domain: Security Operations & Incident Response
+  description: Plans and facilitates incident response tabletop exercises.
+  risk_category: Medium
+- name: Incident Communication & Notification
+  code: SOC-014
+  domain: Security Operations & Incident Response
+  description: Manages stakeholder communication during security incidents.
+  risk_category: Low
+- name: Chain of Custody & Evidence Management
+  code: SOC-015
+  domain: Security Operations & Incident Response
+  description: Preserves integrity and custody records for forensic evidence.
+  risk_category: Medium
+- name: SOC Metrics & Reporting
+  code: SOC-016
+  domain: Security Operations & Incident Response
+  description: Tracks and reports on SOC performance and incident metrics.
+  risk_category: Low
+- name: Deception Technology / Honeypots
+  code: SOC-017
+  domain: Security Operations & Incident Response
+  description: Deploys decoys to detect and delay attacker activity.
+  risk_category: Medium
+- name: Insider Threat Detection
+  code: SOC-018
+  domain: Security Operations & Incident Response
+  description: Identifies risky or malicious behavior by internal users.
+  risk_category: Low

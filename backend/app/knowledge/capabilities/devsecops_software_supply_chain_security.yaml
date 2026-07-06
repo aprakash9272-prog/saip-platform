@@ -1,0 +1,91 @@
+- name: CI/CD Pipeline Security
+  code: DEV-001
+  domain: DevSecOps & Software Supply Chain Security
+  description: Secures build and deployment pipelines from compromise.
+  risk_category: Critical
+- name: Software Bill of Materials (SBOM) Management
+  code: DEV-002
+  domain: DevSecOps & Software Supply Chain Security
+  description: Generates and tracks SBOMs for software components.
+  risk_category: High
+- name: Container Registry Scanning
+  code: DEV-003
+  domain: DevSecOps & Software Supply Chain Security
+  description: Scans container images stored in registries for vulnerabilities.
+  risk_category: Critical
+- name: Secrets Management for Pipelines
+  code: DEV-004
+  domain: DevSecOps & Software Supply Chain Security
+  description: Securely injects and manages secrets used in build/deploy pipelines.
+  risk_category: High
+- name: Infrastructure as Code Scanning
+  code: DEV-005
+  domain: DevSecOps & Software Supply Chain Security
+  description: Scans IaC definitions for security misconfigurations pre-deployment.
+  risk_category: Critical
+- name: Artifact Signing & Provenance (SLSA)
+  code: DEV-006
+  domain: DevSecOps & Software Supply Chain Security
+  description: Signs build artifacts and tracks provenance to prevent tampering.
+  risk_category: High
+- name: Dependency Confusion Protection
+  code: DEV-007
+  domain: DevSecOps & Software Supply Chain Security
+  description: Prevents malicious packages from being substituted for internal ones.
+  risk_category: Medium
+- name: Build Environment Hardening
+  code: DEV-008
+  domain: DevSecOps & Software Supply Chain Security
+  description: Secures and isolates the infrastructure used to build software.
+  risk_category: Medium
+- name: Policy as Code Enforcement
+  code: DEV-009
+  domain: DevSecOps & Software Supply Chain Security
+  description: Encodes and enforces security policy directly within pipelines.
+  risk_category: Medium
+- name: Open-Source License & Vulnerability Governance
+  code: DEV-010
+  domain: DevSecOps & Software Supply Chain Security
+  description: Governs use of open-source components for license and vulnerability
+    risk.
+  risk_category: Medium
+- name: Git Repository Security & Access Control
+  code: DEV-011
+  domain: DevSecOps & Software Supply Chain Security
+  description: Secures source code repositories and enforces access controls.
+  risk_category: Medium
+- name: Developer Security Training
+  code: DEV-012
+  domain: DevSecOps & Software Supply Chain Security
+  description: Trains developers on secure coding practices.
+  risk_category: Medium
+- name: Shift-Left Security Testing Integration
+  code: DEV-013
+  domain: DevSecOps & Software Supply Chain Security
+  description: Integrates security testing early in the development workflow.
+  risk_category: Medium
+- name: Supply Chain Attack Detection
+  code: DEV-014
+  domain: DevSecOps & Software Supply Chain Security
+  description: Detects compromise introduced via third-party software components.
+  risk_category: Low
+- name: Third-Party Package Vetting
+  code: DEV-015
+  domain: DevSecOps & Software Supply Chain Security
+  description: Assesses third-party packages before approving them for use.
+  risk_category: Medium
+- name: Pipeline Access Control & Approval Gates
+  code: DEV-016
+  domain: DevSecOps & Software Supply Chain Security
+  description: Enforces approval gates for sensitive pipeline stages.
+  risk_category: Low
+- name: Immutable Infrastructure Enforcement
+  code: DEV-017
+  domain: DevSecOps & Software Supply Chain Security
+  description: Ensures deployed infrastructure cannot be modified in place.
+  risk_category: Medium
+- name: DevSecOps Metrics & Dashboards
+  code: DEV-018
+  domain: DevSecOps & Software Supply Chain Security
+  description: Tracks security metrics across the development lifecycle.
+  risk_category: Low

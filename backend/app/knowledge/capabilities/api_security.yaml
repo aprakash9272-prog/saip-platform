@@ -1,0 +1,90 @@
+- name: API Gateway Security
+  code: API-001
+  domain: API Security
+  description: Enforces security policy for API traffic at the gateway layer.
+  risk_category: Critical
+- name: API Discovery & Inventory
+  code: API-002
+  domain: API Security
+  description: Discovers and catalogs known and unknown (shadow) APIs.
+  risk_category: High
+- name: API Threat Protection (OWASP API Top 10)
+  code: API-003
+  domain: API Security
+  description: Protects against common API-specific attack patterns.
+  risk_category: Critical
+- name: API Authentication & Authorization
+  code: API-004
+  domain: API Security
+  description: Enforces identity verification and access control for API calls.
+  risk_category: High
+- name: API Rate Limiting & Throttling
+  code: API-005
+  domain: API Security
+  description: Limits request volume to prevent abuse and denial of service.
+  risk_category: Critical
+- name: API Schema Validation
+  code: API-006
+  domain: API Security
+  description: Validates API requests and responses against defined schemas.
+  risk_category: High
+- name: API Data Leakage Detection
+  code: API-007
+  domain: API Security
+  description: Detects sensitive data exposure in API responses.
+  risk_category: Medium
+- name: GraphQL Security
+  code: API-008
+  domain: API Security
+  description: Applies security controls specific to GraphQL query patterns.
+  risk_category: Medium
+- name: API Abuse & Bot Detection
+  code: API-009
+  domain: API Security
+  description: Detects automated abuse of API endpoints.
+  risk_category: Medium
+- name: Third-Party API Risk Management
+  code: API-010
+  domain: API Security
+  description: Assesses and monitors risk from third-party API integrations.
+  risk_category: Medium
+- name: API Key & Token Lifecycle Management
+  code: API-011
+  domain: API Security
+  description: Manages issuance, rotation, and revocation of API credentials.
+  risk_category: Medium
+- name: Shadow API Detection
+  code: API-012
+  domain: API Security
+  description: Identifies undocumented or unmanaged APIs in production.
+  risk_category: Medium
+- name: API Security Testing
+  code: API-013
+  domain: API Security
+  description: Tests APIs for vulnerabilities as part of the development lifecycle.
+  risk_category: Medium
+- name: Webhook Security
+  code: API-014
+  domain: API Security
+  description: Validates and secures inbound and outbound webhook traffic.
+  risk_category: Low
+- name: API Traffic Analytics
+  code: API-015
+  domain: API Security
+  description: Analyzes API traffic patterns to identify anomalies and risk.
+  risk_category: Medium
+- name: API Versioning Security Controls
+  code: API-016
+  domain: API Security
+  description: Ensures deprecated API versions do not introduce security gaps.
+  risk_category: Low
+- name: Mutual TLS for APIs
+  code: API-017
+  domain: API Security
+  description: Enforces mutual certificate-based authentication for API connections.
+  risk_category: Medium
+- name: API Compliance Monitoring
+  code: API-018
+  domain: API Security
+  description: Monitors API usage against regulatory and policy requirements.
+  risk_category: Low

@@ -1,0 +1,92 @@
+- name: Next-Generation Firewall (NGFW)
+  code: NET-001
+  domain: Network Security
+  description: Application-aware filtering combined with traditional firewall controls.
+  risk_category: Critical
+- name: Intrusion Detection System (IDS)
+  code: NET-002
+  domain: Network Security
+  description: Passively monitors network traffic for known attack patterns.
+  risk_category: High
+- name: Intrusion Prevention System (IPS)
+  code: NET-003
+  domain: Network Security
+  description: Actively blocks network traffic matching known attack patterns.
+  risk_category: Critical
+- name: Network Traffic Analysis (NTA)
+  code: NET-004
+  domain: Network Security
+  description: Detects anomalies and threats through behavioral analysis of network
+    flows.
+  risk_category: High
+- name: Network Access Control (NAC)
+  code: NET-005
+  domain: Network Security
+  description: Enforces policy on which devices may connect to the network.
+  risk_category: Critical
+- name: VPN / Secure Remote Access
+  code: NET-006
+  domain: Network Security
+  description: Encrypted tunnels providing secure remote connectivity to internal
+    resources.
+  risk_category: High
+- name: DDoS Protection
+  code: NET-007
+  domain: Network Security
+  description: Detects and mitigates distributed denial-of-service attacks.
+  risk_category: Medium
+- name: DNS Security
+  code: NET-008
+  domain: Network Security
+  description: Filters and monitors DNS traffic to block malicious domains.
+  risk_category: Medium
+- name: Network Segmentation & Microsegmentation
+  code: NET-009
+  domain: Network Security
+  description: Divides networks into isolated zones to limit lateral movement.
+  risk_category: Medium
+- name: Web Proxy / Secure Web Gateway
+  code: NET-010
+  domain: Network Security
+  description: Filters and inspects outbound web traffic for threats and policy violations.
+  risk_category: Medium
+- name: Network Sandbox / Malware Detonation
+  code: NET-011
+  domain: Network Security
+  description: Detonates suspicious files in an isolated environment to observe behavior.
+  risk_category: Medium
+- name: Wireless Network Security
+  code: NET-012
+  domain: Network Security
+  description: Protects Wi-Fi networks from unauthorized access and rogue access points.
+  risk_category: Medium
+- name: Network Packet Capture & Forensics
+  code: NET-013
+  domain: Network Security
+  description: Captures and retains packet-level data to support investigations.
+  risk_category: Medium
+- name: East-West Traffic Inspection
+  code: NET-014
+  domain: Network Security
+  description: Inspects lateral traffic between internal hosts for threats.
+  risk_category: Low
+- name: Load Balancer Security
+  code: NET-015
+  domain: Network Security
+  description: Hardens and monitors load-balancing infrastructure against abuse.
+  risk_category: Medium
+- name: Network Time Protocol (NTP) Security
+  code: NET-016
+  domain: Network Security
+  description: Protects time synchronization services from spoofing and abuse.
+  risk_category: Low
+- name: Software-Defined Perimeter (SDP)
+  code: NET-017
+  domain: Network Security
+  description: Cloaks network resources until a device and user are verified.
+  risk_category: Medium
+- name: Network Configuration Compliance
+  code: NET-018
+  domain: Network Security
+  description: Validates network device configurations against security baselines.
+  risk_category: Low

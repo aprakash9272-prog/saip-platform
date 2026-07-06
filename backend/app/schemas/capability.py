@@ -7,18 +7,19 @@ from app.models.capability import CapabilityBase
 
 
 class CapabilityCreate(CapabilityBase):
-    pass
+    domain_id: int
 
 
 class CapabilityUpdate(SQLModel):
     name: Optional[str] = None
     code: Optional[str] = None
-    domain: Optional[str] = None
+    domain_id: Optional[int] = None
     description: Optional[str] = None
     risk_category: Optional[str] = None
 
 
 class CapabilityRead(CapabilityBase):
     id: int
+    domain_id: int
     created_at: datetime
     updated_at: datetime

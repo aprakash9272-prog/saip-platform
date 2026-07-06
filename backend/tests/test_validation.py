@@ -3,7 +3,12 @@ from pydantic import ValidationError
 
 from app.knowledge.exceptions import CircularReferenceError
 from app.knowledge.graph import check_for_cycles
-from app.knowledge.yaml_schemas import CapabilityYAML, ModuleYAML, VendorYAML
+from app.knowledge.yaml_schemas import (
+    CapabilityYAML,
+    DomainYAML,
+    ModuleYAML,
+    VendorYAML,
+)
 
 
 def test_vendor_yaml_requires_name():
@@ -29,14 +34,35 @@ def test_module_yaml_defaults_capabilities_to_empty_list():
     assert module.capabilities == []
 
 
+def test_capability_yaml_requires_domain():
+    with pytest.raises(ValidationError):
+        CapabilityYAML.model_validate({"name": "Detection", "code": "EDR-001"})
+
+
 def test_capability_code_rejects_invalid_characters():
     with pytest.raises(ValidationError):
-        CapabilityYAML.model_validate({"name": "Detection", "code": "bad code!"})
+        CapabilityYAML.model_validate(
+            {"name": "Detection", "code": "bad code!", "domain": "Endpoint Security"}
+        )
 
 
 def test_capability_code_accepts_slug_like_value():
-    capability = CapabilityYAML.model_validate({"name": "Detection", "code": "EDR-001"})
+    capability = CapabilityYAML.model_validate(
+        {"name": "Detection", "code": "EDR-001", "domain": "Endpoint Security"}
+    )
     assert capability.code == "EDR-001"
+    assert capability.domain == "Endpoint Security"
+
+
+def test_domain_yaml_requires_name():
+    with pytest.raises(ValidationError):
+        DomainYAML.model_validate({"description": "Missing a name."})
+
+
+def test_domain_yaml_accepts_minimal_payload():
+    domain = DomainYAML.model_validate({"name": "Endpoint Security"})
+    assert domain.name == "Endpoint Security"
+    assert domain.description is None
 
 
 def test_check_for_cycles_passes_on_acyclic_graph():

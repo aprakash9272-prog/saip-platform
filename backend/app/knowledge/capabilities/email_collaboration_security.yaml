@@ -1,0 +1,90 @@
+- name: Secure Email Gateway (SEG)
+  code: EML-001
+  domain: Email & Collaboration Security
+  description: Filters inbound and outbound email for spam, malware, and phishing.
+  risk_category: Critical
+- name: Anti-Phishing Protection
+  code: EML-002
+  domain: Email & Collaboration Security
+  description: Detects and blocks phishing emails using content and behavioral analysis.
+  risk_category: High
+- name: Email Encryption
+  code: EML-003
+  domain: Email & Collaboration Security
+  description: Encrypts email content and attachments in transit and at rest.
+  risk_category: Critical
+- name: Business Email Compromise (BEC) Protection
+  code: EML-004
+  domain: Email & Collaboration Security
+  description: Detects impersonation and fraud attempts targeting email.
+  risk_category: High
+- name: Email Authentication (SPF/DKIM/DMARC)
+  code: EML-005
+  domain: Email & Collaboration Security
+  description: Validates sender authenticity to prevent domain spoofing.
+  risk_category: Critical
+- name: Collaboration Platform Security (Teams/Slack)
+  code: EML-006
+  domain: Email & Collaboration Security
+  description: Secures messaging and file sharing within collaboration suites.
+  risk_category: High
+- name: Email Data Loss Prevention
+  code: EML-007
+  domain: Email & Collaboration Security
+  description: Prevents sensitive data from leaving via email.
+  risk_category: Medium
+- name: Email Archiving & eDiscovery
+  code: EML-008
+  domain: Email & Collaboration Security
+  description: Retains email for compliance and supports legal discovery requests.
+  risk_category: Medium
+- name: Attachment Sandboxing
+  code: EML-009
+  domain: Email & Collaboration Security
+  description: Detonates email attachments in isolation to detect malicious behavior.
+  risk_category: Medium
+- name: URL Rewriting & Link Protection
+  code: EML-010
+  domain: Email & Collaboration Security
+  description: Rewrites and checks links at click-time to block malicious destinations.
+  risk_category: Medium
+- name: Internal Email Threat Detection
+  code: EML-011
+  domain: Email & Collaboration Security
+  description: Detects compromised mailboxes sending malicious internal email.
+  risk_category: Medium
+- name: Email Account Takeover Protection
+  code: EML-012
+  domain: Email & Collaboration Security
+  description: Detects signs of unauthorized access to email accounts.
+  risk_category: Medium
+- name: Simulated Phishing Training
+  code: EML-013
+  domain: Email & Collaboration Security
+  description: Runs simulated phishing campaigns to train and measure user awareness.
+  risk_category: Medium
+- name: Calendar & Meeting Security
+  code: EML-014
+  domain: Email & Collaboration Security
+  description: Protects against malicious or spoofed calendar invitations.
+  risk_category: Low
+- name: File Sharing Security (OneDrive/Google Drive)
+  code: EML-015
+  domain: Email & Collaboration Security
+  description: Monitors and controls sharing of files via cloud storage integrations.
+  risk_category: Medium
+- name: Instant Messaging Security
+  code: EML-016
+  domain: Email & Collaboration Security
+  description: Secures enterprise chat and instant messaging platforms.
+  risk_category: Low
+- name: Email Continuity / Backup
+  code: EML-017
+  domain: Email & Collaboration Security
+  description: Ensures email availability and recovery during outages.
+  risk_category: Medium
+- name: Executive/VIP Email Protection
+  code: EML-018
+  domain: Email & Collaboration Security
+  description: Applies enhanced protection for high-risk executive mailboxes.
+  risk_category: Low

@@ -1,0 +1,91 @@
+- name: Threat Intelligence
+  code: TI-001
+  domain: Threat Intelligence
+  description: Curated indicators and adversary intelligence to contextualize alerts.
+  risk_category: Critical
+- name: Threat Intelligence Platform (TIP)
+  code: TI-002
+  domain: Threat Intelligence
+  description: Aggregates, correlates, and manages threat intelligence feeds.
+  risk_category: High
+- name: Indicator of Compromise (IOC) Management
+  code: TI-003
+  domain: Threat Intelligence
+  description: Collects and operationalizes IOCs across detection tooling.
+  risk_category: Critical
+- name: Dark Web Monitoring
+  code: TI-004
+  domain: Threat Intelligence
+  description: Monitors dark web sources for mentions of assets, credentials, or data.
+  risk_category: High
+- name: Brand & Digital Risk Protection
+  code: TI-005
+  domain: Threat Intelligence
+  description: Detects impersonation, phishing sites, and brand abuse.
+  risk_category: Critical
+- name: Threat Actor Tracking
+  code: TI-006
+  domain: Threat Intelligence
+  description: Profiles and tracks the tactics of known threat actor groups.
+  risk_category: High
+- name: Malware Analysis Sandbox
+  code: TI-007
+  domain: Threat Intelligence
+  description: Detonates and analyzes malware samples to extract behavioral intelligence.
+  risk_category: Medium
+- name: Threat Intelligence Sharing (ISAC/ISAO Integration)
+  code: TI-008
+  domain: Threat Intelligence
+  description: Exchanges intelligence with industry sharing communities.
+  risk_category: Medium
+- name: Attack Surface Management
+  code: TI-009
+  domain: Threat Intelligence
+  description: Continuously discovers and monitors internet-facing assets and exposure.
+  risk_category: Medium
+- name: Phishing Intelligence
+  code: TI-010
+  domain: Threat Intelligence
+  description: Collects and analyzes phishing campaigns targeting the organization.
+  risk_category: Medium
+- name: Vulnerability Intelligence Feeds
+  code: TI-011
+  domain: Threat Intelligence
+  description: Delivers curated intelligence on newly disclosed vulnerabilities.
+  risk_category: Medium
+- name: MITRE ATT&CK Mapping & Enrichment
+  code: TI-012
+  domain: Threat Intelligence
+  description: Maps detections and intelligence to the ATT&CK framework.
+  risk_category: Medium
+- name: Geopolitical Threat Monitoring
+  code: TI-013
+  domain: Threat Intelligence
+  description: Tracks geopolitical events that may indicate elevated cyber risk.
+  risk_category: Medium
+- name: Supply Chain Threat Intelligence
+  code: TI-014
+  domain: Threat Intelligence
+  description: Monitors third-party and supplier ecosystems for emerging threats.
+  risk_category: Low
+- name: Credential Leak Monitoring
+  code: TI-015
+  domain: Threat Intelligence
+  description: Detects exposed organizational credentials in breach data and paste
+    sites.
+  risk_category: Medium
+- name: Threat Intelligence Automation (TIP-to-SOAR)
+  code: TI-016
+  domain: Threat Intelligence
+  description: Automates enrichment and action on intelligence via SOAR integration.
+  risk_category: Low
+- name: Strategic Threat Reporting
+  code: TI-017
+  domain: Threat Intelligence
+  description: Produces executive-level reporting on the threat landscape.
+  risk_category: Medium
+- name: Open-Source Intelligence (OSINT) Collection
+  code: TI-018
+  domain: Threat Intelligence
+  description: Gathers publicly available information to support threat analysis.
+  risk_category: Low

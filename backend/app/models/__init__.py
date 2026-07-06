@@ -1,4 +1,5 @@
 from app.models.capability import Capability, CapabilityBase
+from app.models.domain import Domain, DomainBase
 from app.models.edition import Edition, EditionBase
 from app.models.framework import Framework, FrameworkBase
 from app.models.framework_mapping import FrameworkMapping, FrameworkMappingBase
@@ -17,6 +18,8 @@ __all__ = [
     "Module",
     "ModuleBase",
     "ModuleCapabilityLink",
+    "Domain",
+    "DomainBase",
     "Capability",
     "CapabilityBase",
     "Framework",

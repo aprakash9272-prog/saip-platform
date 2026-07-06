@@ -5,6 +5,7 @@ RESOURCES = [
     "products",
     "editions",
     "modules",
+    "domains",
     "capabilities",
     "frameworks",
     "mappings",

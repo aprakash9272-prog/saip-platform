@@ -6,6 +6,7 @@ from fastapi.responses import JSONResponse
 
 from app.api.routes import (
     capabilities,
+    domains,
     editions,
     frameworks,
     health,
@@ -67,6 +68,7 @@ app.include_router(vendors.router)
 app.include_router(products.router)
 app.include_router(editions.router)
 app.include_router(modules.router)
+app.include_router(domains.router)
 app.include_router(capabilities.router)
 app.include_router(frameworks.router)
 app.include_router(mappings.router)

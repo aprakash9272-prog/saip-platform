@@ -6,8 +6,10 @@ def test_full_hierarchy_via_api(client):
     edition = client.post(
         "/editions", json={"name": "Pro", "product_id": product["id"]}
     ).json()
+    domain = client.post("/domains", json={"name": "Endpoint Security"}).json()
     capability = client.post(
-        "/capabilities", json={"name": "Detection", "code": "EDR-999"}
+        "/capabilities",
+        json={"name": "Detection", "code": "EDR-999", "domain_id": domain["id"]},
     ).json()
 
     module_resp = client.post(
@@ -43,6 +45,14 @@ def test_product_rejects_invalid_vendor_reference(client):
     assert resp.status_code == 422
 
 
+def test_capability_rejects_invalid_domain_reference(client):
+    resp = client.post(
+        "/capabilities",
+        json={"name": "Detection", "code": "EDR-998", "domain_id": 999999},
+    )
+    assert resp.status_code == 422
+
+
 def test_module_rejects_invalid_capability_reference(client):
     vendor = client.post("/vendors", json={"name": "Acme"}).json()
     product = client.post(
@@ -67,8 +77,13 @@ def test_module_capability_links_can_be_updated(client):
     edition = client.post(
         "/editions", json={"name": "Pro", "product_id": product["id"]}
     ).json()
-    cap_a = client.post("/capabilities", json={"name": "A", "code": "A-1"}).json()
-    cap_b = client.post("/capabilities", json={"name": "B", "code": "B-1"}).json()
+    domain = client.post("/domains", json={"name": "Endpoint Security"}).json()
+    cap_a = client.post(
+        "/capabilities", json={"name": "A", "code": "A-1", "domain_id": domain["id"]}
+    ).json()
+    cap_b = client.post(
+        "/capabilities", json={"name": "B", "code": "B-1", "domain_id": domain["id"]}
+    ).json()
 
     module = client.post(
         "/modules",

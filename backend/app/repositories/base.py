@@ -30,6 +30,7 @@ class BaseRepository(Generic[ModelType]):
         skip: int = 0,
         limit: int = 50,
         search: Optional[str] = None,
+        filters: Optional[dict] = None,
     ) -> tuple[list[ModelType], int]:
         statement = select(self.model)
         count_statement = select(func.count()).select_from(self.model)
@@ -42,11 +43,25 @@ class BaseRepository(Generic[ModelType]):
             statement = statement.where(or_(*conditions))
             count_statement = count_statement.where(or_(*conditions))
 
+        for field, value in (filters or {}).items():
+            if value is None:
+                continue
+            condition = getattr(self.model, field) == value
+            statement = statement.where(condition)
+            count_statement = count_statement.where(condition)
+
         total = self.session.exec(count_statement).one()
         items = self.session.exec(
             statement.offset(skip).limit(limit).order_by(self.model.id)
         ).all()
         return list(items), total
+
+    def distinct_values(self, field: str) -> list:
+        column = getattr(self.model, field)
+        statement = (
+            select(column).where(column.is_not(None)).distinct().order_by(column)
+        )
+        return list(self.session.exec(statement).all())
 
     def create(self, obj: ModelType) -> ModelType:
         self.session.add(obj)

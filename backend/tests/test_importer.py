@@ -64,6 +64,14 @@ def _build_valid_kb(root: Path) -> None:
         """,
     )
     _write(
+        root / "domains",
+        "d.yaml",
+        """
+        name: Endpoint
+        description: Test domain.
+        """,
+    )
+    _write(
         root / "capabilities",
         "c.yaml",
         """
@@ -103,6 +111,7 @@ def test_import_all_creates_expected_rows(session, tmp_path):
     assert result.products.created == 1
     assert result.editions.created == 1
     assert result.modules.created == 1
+    assert result.domains.created == 1
     assert result.capabilities.created == 1
     assert result.frameworks.created == 1
     assert result.mappings.created == 1
@@ -113,6 +122,7 @@ def test_import_all_creates_expected_rows(session, tmp_path):
     assert len(vendor.products) == 1
     module = vendor.products[0].editions[0].modules[0]
     assert [c.code for c in module.capabilities] == ["EDR-100"]
+    assert module.capabilities[0].domain.name == "Endpoint"
     assert module.capabilities[0].framework_mappings[0].control_id == "TC-1"
 
 
@@ -191,9 +201,30 @@ def test_import_rejects_missing_capability_reference(session, tmp_path):
         KnowledgeImporter(session).import_all(tmp_path)
 
 
+def test_import_rejects_missing_domain_reference(session, tmp_path):
+    _write(
+        tmp_path / "capabilities",
+        "c.yaml",
+        """
+        name: Detection
+        code: EDR-100
+        domain: DoesNotExist
+        """,
+    )
+    with pytest.raises(ReferenceNotFoundError):
+        KnowledgeImporter(session).import_all(tmp_path)
+
+
 def test_import_rejects_duplicate_vendor_in_batch(session, tmp_path):
     _write(tmp_path / "vendors", "a.yaml", "name: Acme\n")
     _write(tmp_path / "vendors", "b.yaml", "name: Acme\n")
+    with pytest.raises(DuplicateInBatchError):
+        KnowledgeImporter(session).import_all(tmp_path)
+
+
+def test_import_rejects_duplicate_domain_in_batch(session, tmp_path):
+    _write(tmp_path / "domains", "a.yaml", "name: Endpoint\n")
+    _write(tmp_path / "domains", "b.yaml", "name: Endpoint\n")
     with pytest.raises(DuplicateInBatchError):
         KnowledgeImporter(session).import_all(tmp_path)
 
@@ -213,6 +244,7 @@ def test_sample_knowledge_base_imports_cleanly(session):
     assert result.products.created == 2
     assert result.editions.created == 2
     assert result.modules.created == 2
-    assert result.capabilities.created == 2
+    assert result.domains.created == 18
+    assert result.capabilities.created == 324
     assert result.frameworks.created == 1
     assert result.mappings.created == 2

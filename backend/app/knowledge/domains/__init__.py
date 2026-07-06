@@ -1,0 +1,1 @@
+"""Domains knowledge namespace."""

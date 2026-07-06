@@ -1,0 +1,90 @@
+- name: Container Image Scanning
+  code: CTN-001
+  domain: Container & Kubernetes Security
+  description: Scans container images for vulnerabilities and misconfigurations.
+  risk_category: Critical
+- name: Kubernetes Admission Control
+  code: CTN-002
+  domain: Container & Kubernetes Security
+  description: Enforces policy on workloads before they are admitted to a cluster.
+  risk_category: High
+- name: Container Runtime Protection
+  code: CTN-003
+  domain: Container & Kubernetes Security
+  description: Detects and blocks malicious behavior in running containers.
+  risk_category: Critical
+- name: Kubernetes Network Policy Enforcement
+  code: CTN-004
+  domain: Container & Kubernetes Security
+  description: Enforces network segmentation between pods and namespaces.
+  risk_category: High
+- name: Container Registry Access Control
+  code: CTN-005
+  domain: Container & Kubernetes Security
+  description: Controls who can push, pull, and manage container images.
+  risk_category: Critical
+- name: Kubernetes RBAC Management
+  code: CTN-006
+  domain: Container & Kubernetes Security
+  description: Manages role-based access control within Kubernetes clusters.
+  risk_category: High
+- name: Pod Security Standards Enforcement
+  code: CTN-007
+  domain: Container & Kubernetes Security
+  description: Enforces baseline security requirements on pod specifications.
+  risk_category: Medium
+- name: Container Host Hardening
+  code: CTN-008
+  domain: Container & Kubernetes Security
+  description: Secures the underlying host operating system running containers.
+  risk_category: Medium
+- name: Service Mesh Security
+  code: CTN-009
+  domain: Container & Kubernetes Security
+  description: Secures service-to-service communication within a service mesh.
+  risk_category: Medium
+- name: Kubernetes Secrets Management
+  code: CTN-010
+  domain: Container & Kubernetes Security
+  description: Securely stores and injects secrets into Kubernetes workloads.
+  risk_category: Medium
+- name: Container Drift Detection
+  code: CTN-011
+  domain: Container & Kubernetes Security
+  description: Detects unauthorized changes to running containers versus their image.
+  risk_category: Medium
+- name: Kubernetes Audit Logging
+  code: CTN-012
+  domain: Container & Kubernetes Security
+  description: Captures and analyzes Kubernetes API server audit events.
+  risk_category: Medium
+- name: Multi-Cluster Security Management
+  code: CTN-013
+  domain: Container & Kubernetes Security
+  description: Manages consistent security policy across multiple clusters.
+  risk_category: Medium
+- name: Container Compliance Benchmarking (CIS)
+  code: CTN-014
+  domain: Container & Kubernetes Security
+  description: Assesses clusters and hosts against CIS Kubernetes benchmarks.
+  risk_category: Low
+- name: Serverless Container Security
+  code: CTN-015
+  domain: Container & Kubernetes Security
+  description: Secures container-based serverless execution environments.
+  risk_category: Medium
+- name: Container Forensics & Incident Response
+  code: CTN-016
+  domain: Container & Kubernetes Security
+  description: Supports investigation of security incidents in containerized environments.
+  risk_category: Low
+- name: Kubernetes API Server Protection
+  code: CTN-017
+  domain: Container & Kubernetes Security
+  description: Protects the Kubernetes control plane from unauthorized access.
+  risk_category: Medium
+- name: Sidecar/Proxy Security Configuration
+  code: CTN-018
+  domain: Container & Kubernetes Security
+  description: Secures configuration of sidecar proxies used in service meshes.
+  risk_category: Low

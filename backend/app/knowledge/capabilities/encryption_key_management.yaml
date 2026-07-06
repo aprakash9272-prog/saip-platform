@@ -1,0 +1,91 @@
+- name: Key Management System (KMS)
+  code: ENC-001
+  domain: Encryption & Key Management
+  description: Centrally manages the lifecycle of cryptographic keys.
+  risk_category: Critical
+- name: Hardware Security Module (HSM)
+  code: ENC-002
+  domain: Encryption & Key Management
+  description: Provides tamper-resistant hardware for key storage and cryptographic
+    operations.
+  risk_category: High
+- name: Public Key Infrastructure (PKI)
+  code: ENC-003
+  domain: Encryption & Key Management
+  description: Issues and manages digital certificates for authentication and encryption.
+  risk_category: Critical
+- name: Certificate Lifecycle Management
+  code: ENC-004
+  domain: Encryption & Key Management
+  description: Tracks issuance, renewal, and revocation of digital certificates.
+  risk_category: High
+- name: Data-at-Rest Encryption Management
+  code: ENC-005
+  domain: Encryption & Key Management
+  description: Manages encryption policy and keys for stored data.
+  risk_category: Critical
+- name: Data-in-Transit Encryption (TLS Management)
+  code: ENC-006
+  domain: Encryption & Key Management
+  description: Manages TLS configuration and certificates for encrypted transport.
+  risk_category: High
+- name: Encryption Key Rotation
+  code: ENC-007
+  domain: Encryption & Key Management
+  description: Automates periodic rotation of cryptographic keys.
+  risk_category: Medium
+- name: Bring Your Own Key (BYOK) / Hold Your Own Key (HYOK)
+  code: ENC-008
+  domain: Encryption & Key Management
+  description: Allows customers to supply or retain control of encryption keys.
+  risk_category: Medium
+- name: Quantum-Resistant Cryptography Readiness
+  code: ENC-009
+  domain: Encryption & Key Management
+  description: Assesses and prepares for migration to post-quantum cryptography.
+  risk_category: Medium
+- name: Code Signing Certificate Management
+  code: ENC-010
+  domain: Encryption & Key Management
+  description: Manages certificates used to sign and verify software artifacts.
+  risk_category: Medium
+- name: Secrets Vault Management
+  code: ENC-011
+  domain: Encryption & Key Management
+  description: Securely stores and controls access to application secrets.
+  risk_category: Medium
+- name: Format-Preserving Encryption
+  code: ENC-012
+  domain: Encryption & Key Management
+  description: Encrypts data while preserving its original format for compatibility.
+  risk_category: Medium
+- name: End-to-End Encryption for Messaging
+  code: ENC-013
+  domain: Encryption & Key Management
+  description: Ensures only communicating parties can read message content.
+  risk_category: Medium
+- name: Cryptographic Algorithm Governance
+  code: ENC-014
+  domain: Encryption & Key Management
+  description: Governs approved cryptographic algorithms and deprecation of weak ones.
+  risk_category: Low
+- name: Key Escrow & Recovery
+  code: ENC-015
+  domain: Encryption & Key Management
+  description: Provides controlled recovery mechanisms for lost or escrowed keys.
+  risk_category: Medium
+- name: SSH Key Management
+  code: ENC-016
+  domain: Encryption & Key Management
+  description: Manages issuance, rotation, and revocation of SSH keys.
+  risk_category: Low
+- name: Encryption Compliance Auditing
+  code: ENC-017
+  domain: Encryption & Key Management
+  description: Audits encryption usage against policy and regulatory requirements.
+  risk_category: Medium
+- name: Homomorphic Encryption Evaluation
+  code: ENC-018
+  domain: Encryption & Key Management
+  description: Evaluates use of encryption schemes that allow computation on ciphertext.
+  risk_category: Low

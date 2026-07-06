@@ -2,6 +2,7 @@ import { z } from "zod";
 
 import {
   capabilitiesApi,
+  domainsApi,
   editionsApi,
   frameworksApi,
   mappingsApi,
@@ -12,6 +13,8 @@ import {
 import type {
   Capability,
   CapabilityInput,
+  Domain,
+  DomainInput,
   Edition,
   EditionInput,
   Framework,
@@ -238,6 +241,37 @@ const moduleConfig: ResourceConfig<Module, ModuleInput, Partial<ModuleInput>> = 
   }),
 };
 
+// --------------------------------------------------------------- Domains --
+
+export const domainCreateSchema = z.object({
+  name: z.string().min(1, "Name is required"),
+  description: optionalText,
+});
+export const domainUpdateSchema = domainCreateSchema.partial();
+
+const domainConfig: ResourceConfig<Domain, DomainInput, Partial<DomainInput>> = {
+  key: "domains",
+  title: "Domains",
+  description: "The security domain taxonomy that every capability is classified under.",
+  labelField: "name",
+  api: domainsApi,
+  searchPlaceholder: "Search domains by name or description...",
+  createSchema: domainCreateSchema,
+  updateSchema: domainUpdateSchema,
+  columns: [
+    { key: "name", header: "Name" },
+    { key: "description", header: "Description" },
+  ],
+  fields: [
+    { name: "name", label: "Name", type: "text", required: true },
+    { name: "description", label: "Description", type: "textarea" },
+  ],
+  toFormValues: (item) => ({
+    name: item.name,
+    description: item.description ?? "",
+  }),
+};
+
 // ----------------------------------------------------------- Capabilities --
 
 export const capabilityCreateSchema = z.object({
@@ -249,7 +283,7 @@ export const capabilityCreateSchema = z.object({
       /^[A-Za-z0-9][A-Za-z0-9._-]*$/,
       "Code must be alphanumeric with optional . _ - separators",
     ),
-  domain: optionalText,
+  domain_id: z.coerce.number({ error: "Domain is required" }).int().positive(),
   description: optionalText,
   risk_category: optionalText,
 });
@@ -261,26 +295,36 @@ const capabilityConfig: ResourceConfig<Capability, CapabilityInput, Partial<Capa
   description: "The vendor-neutral security capability taxonomy.",
   labelField: "name",
   api: capabilitiesApi,
-  searchPlaceholder: "Search capabilities by name, code, or domain...",
+  searchPlaceholder: "Search capabilities by name, code, or description...",
   createSchema: capabilityCreateSchema,
   updateSchema: capabilityUpdateSchema,
   columns: [
     { key: "code", header: "Code" },
     { key: "name", header: "Name" },
-    { key: "domain", header: "Domain" },
+    {
+      key: "domain_id",
+      header: "Domain",
+      render: (item, refs) => refs.domains?.get(item.domain_id) ?? item.domain_id,
+    },
     { key: "risk_category", header: "Risk Category" },
   ],
   fields: [
     { name: "name", label: "Name", type: "text", required: true },
     { name: "code", label: "Code", type: "text", required: true, placeholder: "EDR-001" },
-    { name: "domain", label: "Domain", type: "text" },
+    {
+      name: "domain_id",
+      label: "Domain",
+      type: "reference",
+      required: true,
+      reference: { resourceKey: "domains", labelField: "name" },
+    },
     { name: "risk_category", label: "Risk Category", type: "text" },
     { name: "description", label: "Description", type: "textarea" },
   ],
   toFormValues: (item) => ({
     name: item.name,
     code: item.code,
-    domain: item.domain ?? "",
+    domain_id: item.domain_id,
     risk_category: item.risk_category ?? "",
     description: item.description ?? "",
   }),
@@ -389,6 +433,7 @@ export const RESOURCE_REGISTRY: Record<ResourceKey, ResourceConfig> = {
   products: productConfig,
   editions: editionConfig,
   modules: moduleConfig,
+  domains: domainConfig,
   capabilities: capabilityConfig,
   frameworks: frameworkConfig,
   mappings: mappingConfig,

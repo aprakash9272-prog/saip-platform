@@ -14,6 +14,7 @@ from app.knowledge.graph import check_for_cycles
 from app.knowledge.loader import load_yaml_directory
 from app.knowledge.yaml_schemas import (
     CapabilityYAML,
+    DomainYAML,
     EditionYAML,
     FrameworkMappingYAML,
     FrameworkYAML,
@@ -22,6 +23,7 @@ from app.knowledge.yaml_schemas import (
     VendorYAML,
 )
 from app.models.capability import Capability
+from app.models.domain import Domain
 from app.models.edition import Edition
 from app.models.framework import Framework
 from app.models.framework_mapping import FrameworkMapping
@@ -29,6 +31,7 @@ from app.models.module import Module
 from app.models.product import Product
 from app.models.vendor import Vendor
 from app.repositories.capability import CapabilityRepository
+from app.repositories.domain import DomainRepository
 from app.repositories.edition import EditionRepository
 from app.repositories.framework import FrameworkRepository
 from app.repositories.framework_mapping import FrameworkMappingRepository
@@ -60,6 +63,7 @@ class ImportResult:
     editions: ImportSummary = field(default_factory=ImportSummary)
     modules: ImportSummary = field(default_factory=ImportSummary)
     module_capability_links: ImportSummary = field(default_factory=ImportSummary)
+    domains: ImportSummary = field(default_factory=ImportSummary)
     capabilities: ImportSummary = field(default_factory=ImportSummary)
     frameworks: ImportSummary = field(default_factory=ImportSummary)
     mappings: ImportSummary = field(default_factory=ImportSummary)
@@ -71,6 +75,7 @@ class ImportResult:
             "editions": self.editions,
             "modules": self.modules,
             "module_capability_links": self.module_capability_links,
+            "domains": self.domains,
             "capabilities": self.capabilities,
             "frameworks": self.frameworks,
             "mappings": self.mappings,
@@ -93,6 +98,7 @@ class KnowledgeImporter:
         self.product_repo = ProductRepository(session)
         self.edition_repo = EditionRepository(session)
         self.module_repo = ModuleRepository(session)
+        self.domain_repo = DomainRepository(session)
         self.capability_repo = CapabilityRepository(session)
         self.framework_repo = FrameworkRepository(session)
         self.mapping_repo = FrameworkMappingRepository(session)
@@ -102,6 +108,7 @@ class KnowledgeImporter:
         raw_products = load_yaml_directory(base_path / "products")
         raw_editions = load_yaml_directory(base_path / "editions")
         raw_modules = load_yaml_directory(base_path / "modules")
+        raw_domains = load_yaml_directory(base_path / "domains")
         raw_capabilities = load_yaml_directory(base_path / "capabilities")
         raw_frameworks = load_yaml_directory(base_path / "frameworks")
         raw_mappings = load_yaml_directory(base_path / "mappings")
@@ -110,6 +117,7 @@ class KnowledgeImporter:
         products = self._validate_batch(raw_products, ProductYAML)
         editions = self._validate_batch(raw_editions, EditionYAML)
         modules = self._validate_batch(raw_modules, ModuleYAML)
+        domains = self._validate_batch(raw_domains, DomainYAML)
         capabilities = self._validate_batch(raw_capabilities, CapabilityYAML)
         frameworks = self._validate_batch(raw_frameworks, FrameworkYAML)
         mappings = self._validate_batch(raw_mappings, FrameworkMappingYAML)
@@ -128,6 +136,7 @@ class KnowledgeImporter:
             key=lambda m: (m.vendor, m.product, m.edition, m.name),
             entity="Module",
         )
+        self._check_batch_duplicates(domains, key=lambda d: d.name, entity="Domain")
         self._check_batch_duplicates(
             capabilities, key=lambda c: c.code, entity="Capability"
         )
@@ -146,7 +155,9 @@ class KnowledgeImporter:
         )
 
         check_for_cycles(
-            self._build_dependency_graph(products, editions, modules, mappings)
+            self._build_dependency_graph(
+                products, editions, modules, capabilities, mappings
+            )
         )
 
         result = ImportResult()
@@ -217,10 +228,27 @@ class KnowledgeImporter:
             pending_links.append((obj, data.capabilities, source))
             result.modules.record(status_)
 
+        domain_by_name: Dict[str, Domain] = {}
+        for source, data in domains:
+            existing = self.domain_repo.get_by_name(data.name)
+            obj, status_ = self._upsert(Domain, existing, data.model_dump())
+            domain_by_name[data.name] = obj
+            result.domains.record(status_)
+
         capability_by_code: Dict[str, Capability] = {}
         for source, data in capabilities:
+            domain = domain_by_name.get(data.domain) or self.domain_repo.get_by_name(
+                data.domain
+            )
+            if domain is None:
+                raise ReferenceNotFoundError(
+                    f"{source}: capability '{data.code}' references unknown "
+                    f"domain '{data.domain}'"
+                )
+            payload = data.model_dump(exclude={"domain"})
+            payload["domain_id"] = domain.id
             existing = self.capability_repo.get_by_code(data.code)
-            obj, status_ = self._upsert(Capability, existing, data.model_dump())
+            obj, status_ = self._upsert(Capability, existing, payload)
             capability_by_code[data.code] = obj
             result.capabilities.record(status_)
 
@@ -293,6 +321,36 @@ class KnowledgeImporter:
 
         return result
 
+    def import_capabilities_only(self, raw_records: List[dict]) -> ImportSummary:
+        """Validate and upsert a standalone batch of capability records.
+
+        Used by the capability catalog's YAML upload endpoint. Referenced
+        domains must already exist (this does not create domains); commits
+        immediately since it is not part of a larger multi-entity import.
+        """
+        records: List[Record] = [("upload", raw) for raw in raw_records]
+        capabilities = self._validate_batch(records, CapabilityYAML)
+        self._check_batch_duplicates(
+            capabilities, key=lambda c: c.code, entity="Capability"
+        )
+
+        summary = ImportSummary()
+        for source, data in capabilities:
+            domain = self.domain_repo.get_by_name(data.domain)
+            if domain is None:
+                raise ReferenceNotFoundError(
+                    f"{source}: capability '{data.code}' references unknown "
+                    f"domain '{data.domain}'"
+                )
+            payload = data.model_dump(exclude={"domain"})
+            payload["domain_id"] = domain.id
+            existing = self.capability_repo.get_by_code(data.code)
+            _, status_ = self._upsert(Capability, existing, payload)
+            summary.record(status_)
+
+        self.session.commit()
+        return summary
+
     # -- helpers ---------------------------------------------------------
 
     def _validate_batch(
@@ -327,6 +385,7 @@ class KnowledgeImporter:
         products: List[Tuple[str, ProductYAML]],
         editions: List[Tuple[str, EditionYAML]],
         modules: List[Tuple[str, ModuleYAML]],
+        capabilities: List[Tuple[str, CapabilityYAML]],
         mappings: List[Tuple[str, FrameworkMappingYAML]],
     ) -> Dict[str, List[str]]:
         edges: Dict[str, List[str]] = {}
@@ -347,6 +406,8 @@ class KnowledgeImporter:
             add_edge(module_key, f"edition:{m.vendor}/{m.product}/{m.edition}")
             for code in m.capabilities:
                 add_edge(module_key, f"capability:{code}")
+        for _, c in capabilities:
+            add_edge(f"capability:{c.code}", f"domain:{c.domain}")
         for _, mp in mappings:
             mapping_key = (
                 f"mapping:{mp.capability_code}/{mp.framework}/"

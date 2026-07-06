@@ -17,9 +17,14 @@ class BaseService(Generic[ModelType]):
         self.repository = repository
 
     def list(
-        self, *, skip: int = 0, limit: int = 50, search: Optional[str] = None
+        self,
+        *,
+        skip: int = 0,
+        limit: int = 50,
+        search: Optional[str] = None,
+        filters: Optional[dict] = None,
     ) -> tuple[Sequence[ModelType], int]:
-        return self.repository.list(skip=skip, limit=limit, search=search)
+        return self.repository.list(skip=skip, limit=limit, search=search, filters=filters)
 
     def get(self, id_: int) -> ModelType:
         obj = self.repository.get(id_)

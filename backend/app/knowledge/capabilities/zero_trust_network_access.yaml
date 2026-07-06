@@ -1,0 +1,91 @@
+- name: Zero Trust Network Access (ZTNA)
+  code: ZTN-001
+  domain: Zero Trust & Network Access
+  description: Grants per-application access based on continuous identity and context
+    verification.
+  risk_category: Critical
+- name: Continuous Authentication & Trust Scoring
+  code: ZTN-002
+  domain: Zero Trust & Network Access
+  description: Continuously re-evaluates trust throughout a session, not just at login.
+  risk_category: High
+- name: Microsegmentation Policy Engine
+  code: ZTN-003
+  domain: Zero Trust & Network Access
+  description: Defines and enforces fine-grained segmentation policy.
+  risk_category: Critical
+- name: Device Posture Assessment
+  code: ZTN-004
+  domain: Zero Trust & Network Access
+  description: Evaluates device security posture before granting access.
+  risk_category: High
+- name: Secure Access Service Edge (SASE)
+  code: ZTN-005
+  domain: Zero Trust & Network Access
+  description: Converges networking and security into a cloud-delivered service.
+  risk_category: Critical
+- name: Policy Decision Point / Policy Enforcement Point
+  code: ZTN-006
+  domain: Zero Trust & Network Access
+  description: Centralizes access decisions and enforces them at the network edge.
+  risk_category: High
+- name: Software-Defined Perimeter
+  code: ZTN-007
+  domain: Zero Trust & Network Access
+  description: Hides infrastructure until access is explicitly authorized.
+  risk_category: Medium
+- name: Least-Privilege Access Enforcement
+  code: ZTN-008
+  domain: Zero Trust & Network Access
+  description: Continuously enforces minimal necessary access rights.
+  risk_category: Medium
+- name: Contextual/Adaptive Access Control
+  code: ZTN-009
+  domain: Zero Trust & Network Access
+  description: Adjusts access decisions based on real-time risk signals.
+  risk_category: Medium
+- name: Application-Layer Access Broker
+  code: ZTN-010
+  domain: Zero Trust & Network Access
+  description: Brokers access to specific applications rather than full network access.
+  risk_category: Medium
+- name: Zero Trust Identity Verification
+  code: ZTN-011
+  domain: Zero Trust & Network Access
+  description: Strongly verifies identity as the foundation of every access decision.
+  risk_category: Medium
+- name: East-West Traffic Access Control
+  code: ZTN-012
+  domain: Zero Trust & Network Access
+  description: Enforces zero trust principles on internal, lateral traffic.
+  risk_category: Medium
+- name: Zero Trust for OT/IoT
+  code: ZTN-013
+  domain: Zero Trust & Network Access
+  description: Applies zero trust principles to operational technology and IoT devices.
+  risk_category: Medium
+- name: API Gateway Zero Trust Enforcement
+  code: ZTN-014
+  domain: Zero Trust & Network Access
+  description: Enforces zero trust access policy at the API gateway layer.
+  risk_category: Low
+- name: Cloud Workload Identity Verification
+  code: ZTN-015
+  domain: Zero Trust & Network Access
+  description: Verifies workload identity for service-to-service communication.
+  risk_category: Medium
+- name: Zero Trust Data Access Policies
+  code: ZTN-016
+  domain: Zero Trust & Network Access
+  description: Applies zero trust principles to data access decisions.
+  risk_category: Low
+- name: Risk-Based Conditional Access
+  code: ZTN-017
+  domain: Zero Trust & Network Access
+  description: Grants or denies access dynamically based on calculated risk.
+  risk_category: Medium
+- name: Zero Trust Maturity Assessment
+  code: ZTN-018
+  domain: Zero Trust & Network Access
+  description: Benchmarks zero trust adoption against a maturity model.
+  risk_category: Low

@@ -1,5 +1,6 @@
 from app.schemas.capability import CapabilityCreate, CapabilityRead, CapabilityUpdate
 from app.schemas.common import PaginatedResponse
+from app.schemas.domain import DomainCreate, DomainRead, DomainUpdate
 from app.schemas.edition import EditionCreate, EditionRead, EditionUpdate
 from app.schemas.framework import FrameworkCreate, FrameworkRead, FrameworkUpdate
 from app.schemas.framework_mapping import (
@@ -25,6 +26,9 @@ __all__ = [
     "ModuleCreate",
     "ModuleRead",
     "ModuleUpdate",
+    "DomainCreate",
+    "DomainRead",
+    "DomainUpdate",
     "CapabilityCreate",
     "CapabilityRead",
     "CapabilityUpdate",

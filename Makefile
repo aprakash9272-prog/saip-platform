@@ -1,6 +1,6 @@
 .PHONY: help up down build logs ps \
 	backend-install backend-run backend-migrate backend-revision backend-lint backend-test \
-	kb-import kb-import-dry-run \
+	kb-import kb-import-dry-run kb-export \
 	frontend-install frontend-dev frontend-build frontend-lint
 
 help:
@@ -21,6 +21,7 @@ help:
 	@echo ""
 	@echo "  make kb-import           Import the security knowledge base from YAML"
 	@echo "  make kb-import-dry-run   Validate the knowledge base without writing to the DB"
+	@echo "  make kb-export           Export the current DB knowledge base to backend/exports/knowledge"
 	@echo ""
 	@echo "  make frontend-install    Install frontend dependencies"
 	@echo "  make frontend-dev        Run the frontend dev server"
@@ -65,6 +66,9 @@ kb-import:
 
 kb-import-dry-run:
 	cd backend && . .venv/bin/activate && python -m app.knowledge.import_all --dry-run
+
+kb-export:
+	cd backend && . .venv/bin/activate && python -m app.knowledge.export_all
 
 frontend-install:
 	cd frontend && npm install

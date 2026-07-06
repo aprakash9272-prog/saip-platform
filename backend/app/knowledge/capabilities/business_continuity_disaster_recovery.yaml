@@ -1,0 +1,90 @@
+- name: Backup Management
+  code: BCP-001
+  domain: Business Continuity & Disaster Recovery
+  description: Schedules, monitors, and manages data backup operations.
+  risk_category: Critical
+- name: Disaster Recovery Orchestration
+  code: BCP-002
+  domain: Business Continuity & Disaster Recovery
+  description: Automates failover and recovery of systems during a disaster.
+  risk_category: High
+- name: Business Continuity Planning
+  code: BCP-003
+  domain: Business Continuity & Disaster Recovery
+  description: Develops and maintains plans to sustain operations during disruption.
+  risk_category: Critical
+- name: Ransomware Recovery Readiness
+  code: BCP-004
+  domain: Business Continuity & Disaster Recovery
+  description: Prepares recovery procedures specifically for ransomware scenarios.
+  risk_category: High
+- name: Backup Immutability / Air-Gapped Storage
+  code: BCP-005
+  domain: Business Continuity & Disaster Recovery
+  description: Protects backups from deletion or tampering via immutable storage.
+  risk_category: Critical
+- name: Recovery Point/Time Objective Management (RPO/RTO)
+  code: BCP-006
+  domain: Business Continuity & Disaster Recovery
+  description: Defines and validates acceptable data loss and downtime targets.
+  risk_category: High
+- name: Failover & High Availability Testing
+  code: BCP-007
+  domain: Business Continuity & Disaster Recovery
+  description: Regularly tests failover mechanisms to validate readiness.
+  risk_category: Medium
+- name: Crisis Management & Communication
+  code: BCP-008
+  domain: Business Continuity & Disaster Recovery
+  description: Coordinates leadership response and communication during a crisis.
+  risk_category: Medium
+- name: Data Replication Management
+  code: BCP-009
+  domain: Business Continuity & Disaster Recovery
+  description: Manages real-time or scheduled replication of data across sites.
+  risk_category: Medium
+- name: DR Site Management (Hot/Warm/Cold)
+  code: BCP-010
+  domain: Business Continuity & Disaster Recovery
+  description: Manages readiness of alternate recovery sites.
+  risk_category: Medium
+- name: Backup Integrity Verification
+  code: BCP-011
+  domain: Business Continuity & Disaster Recovery
+  description: Validates that backups are complete, uncorrupted, and restorable.
+  risk_category: Medium
+- name: Cyber Resilience Testing
+  code: BCP-012
+  domain: Business Continuity & Disaster Recovery
+  description: Tests organizational ability to operate through a cyber incident.
+  risk_category: Medium
+- name: Continuity of Operations Planning (COOP)
+  code: BCP-013
+  domain: Business Continuity & Disaster Recovery
+  description: Plans for sustaining essential functions during extended disruption.
+  risk_category: Medium
+- name: Business Impact Analysis Tooling
+  code: BCP-014
+  domain: Business Continuity & Disaster Recovery
+  description: Assesses the operational impact of potential disruptions.
+  risk_category: Low
+- name: Supply Chain Continuity Planning
+  code: BCP-015
+  domain: Business Continuity & Disaster Recovery
+  description: Plans for continuity of operations when suppliers are disrupted.
+  risk_category: Medium
+- name: Emergency Notification Systems
+  code: BCP-016
+  domain: Business Continuity & Disaster Recovery
+  description: Rapidly notifies stakeholders during an emergency event.
+  risk_category: Low
+- name: Backup-as-a-Service Management
+  code: BCP-017
+  domain: Business Continuity & Disaster Recovery
+  description: Manages cloud-delivered backup services and providers.
+  risk_category: Medium
+- name: Recovery Testing Automation
+  code: BCP-018
+  domain: Business Continuity & Disaster Recovery
+  description: Automates regular testing of recovery procedures.
+  risk_category: Low

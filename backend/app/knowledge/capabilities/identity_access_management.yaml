@@ -1,0 +1,97 @@
+- name: Single Sign-On (SSO)
+  code: IAM-001
+  domain: Identity & Access Management
+  description: Centralized authentication across applications using a single set of
+    credentials.
+  risk_category: Critical
+- name: Multi-Factor Authentication (MFA)
+  code: IAM-002
+  domain: Identity & Access Management
+  description: Requires a second verification factor beyond a password to authenticate.
+  risk_category: High
+- name: Privileged Access Management (PAM)
+  code: IAM-003
+  domain: Identity & Access Management
+  description: Controls, vaults, and monitors access for privileged and administrative
+    accounts.
+  risk_category: Critical
+- name: Identity Governance & Administration (IGA)
+  code: IAM-004
+  domain: Identity & Access Management
+  description: Manages identity lifecycle, entitlements, and access certification
+    at scale.
+  risk_category: High
+- name: Role-Based Access Control (RBAC)
+  code: IAM-005
+  domain: Identity & Access Management
+  description: Grants access based on predefined roles mapped to job functions.
+  risk_category: Critical
+- name: Attribute-Based Access Control (ABAC)
+  code: IAM-006
+  domain: Identity & Access Management
+  description: Grants access dynamically based on user, resource, and environment
+    attributes.
+  risk_category: High
+- name: Directory Services
+  code: IAM-007
+  domain: Identity & Access Management
+  description: Centralized store of identities and groups used for authentication
+    and authorization.
+  risk_category: Medium
+- name: Identity Lifecycle Management
+  code: IAM-008
+  domain: Identity & Access Management
+  description: Automates provisioning, changes, and deprovisioning of user identities.
+  risk_category: Medium
+- name: Passwordless Authentication
+  code: IAM-009
+  domain: Identity & Access Management
+  description: Authenticates users via biometrics, passkeys, or hardware tokens instead
+    of passwords.
+  risk_category: Medium
+- name: Identity Threat Detection & Response (ITDR)
+  code: IAM-010
+  domain: Identity & Access Management
+  description: Detects and responds to identity-based attacks such as credential theft.
+  risk_category: Medium
+- name: Customer Identity & Access Management (CIAM)
+  code: IAM-011
+  domain: Identity & Access Management
+  description: Manages registration, authentication, and consent for external customers.
+  risk_category: Medium
+- name: Access Certification & Recertification
+  code: IAM-012
+  domain: Identity & Access Management
+  description: Periodic review and attestation of user access entitlements.
+  risk_category: Medium
+- name: Session Management
+  code: IAM-013
+  domain: Identity & Access Management
+  description: Controls session duration, concurrency, and revocation across applications.
+  risk_category: Medium
+- name: Federation & SAML/OIDC Integration
+  code: IAM-014
+  domain: Identity & Access Management
+  description: Enables trust relationships and single sign-on across separate identity
+    domains.
+  risk_category: Low
+- name: Just-In-Time (JIT) Access Provisioning
+  code: IAM-015
+  domain: Identity & Access Management
+  description: Grants temporary, time-bound access only when needed.
+  risk_category: Medium
+- name: Service Account Management
+  code: IAM-016
+  domain: Identity & Access Management
+  description: Governs lifecycle, credentials, and usage of non-human service accounts.
+  risk_category: Low
+- name: Biometric Authentication
+  code: IAM-017
+  domain: Identity & Access Management
+  description: Authenticates users via fingerprint, face, or other biometric factors.
+  risk_category: Medium
+- name: Identity Analytics & Risk Scoring
+  code: IAM-018
+  domain: Identity & Access Management
+  description: Scores identity risk using behavioral and contextual signals.
+  risk_category: Low

@@ -1,0 +1,90 @@
+- name: Static Application Security Testing (SAST)
+  code: APP-001
+  domain: Application Security
+  description: Analyzes source code for vulnerabilities without executing it.
+  risk_category: Critical
+- name: Dynamic Application Security Testing (DAST)
+  code: APP-002
+  domain: Application Security
+  description: Tests running applications for vulnerabilities via simulated attacks.
+  risk_category: High
+- name: Interactive Application Security Testing (IAST)
+  code: APP-003
+  domain: Application Security
+  description: Combines static and dynamic techniques using runtime instrumentation.
+  risk_category: Critical
+- name: Software Composition Analysis (SCA)
+  code: APP-004
+  domain: Application Security
+  description: Identifies vulnerable and outdated open-source dependencies.
+  risk_category: High
+- name: Web Application Firewall (WAF)
+  code: APP-005
+  domain: Application Security
+  description: Filters and blocks malicious HTTP traffic targeting web applications.
+  risk_category: Critical
+- name: Runtime Application Self-Protection (RASP)
+  code: APP-006
+  domain: Application Security
+  description: Detects and blocks attacks from within the running application.
+  risk_category: High
+- name: Secure Code Review
+  code: APP-007
+  domain: Application Security
+  description: Manual or assisted review of source code for security defects.
+  risk_category: Medium
+- name: Application Penetration Testing
+  code: APP-008
+  domain: Application Security
+  description: Manual, adversarial testing of applications to find exploitable flaws.
+  risk_category: Medium
+- name: Secrets Detection in Code
+  code: APP-009
+  domain: Application Security
+  description: Scans repositories for hardcoded credentials and secrets.
+  risk_category: Medium
+- name: Fuzz Testing
+  code: APP-010
+  domain: Application Security
+  description: Feeds malformed input to applications to uncover crashes and vulnerabilities.
+  risk_category: Medium
+- name: Application Threat Modeling
+  code: APP-011
+  domain: Application Security
+  description: Systematically identifies design-level security risks before development.
+  risk_category: Medium
+- name: Bot Management
+  code: APP-012
+  domain: Application Security
+  description: Distinguishes and mitigates automated bot traffic against applications.
+  risk_category: Medium
+- name: Client-Side Application Protection (JS/Magecart)
+  code: APP-013
+  domain: Application Security
+  description: Detects and blocks malicious script injection in the browser.
+  risk_category: Medium
+- name: Application Dependency Vulnerability Scanning
+  code: APP-014
+  domain: Application Security
+  description: Continuously scans application dependencies for known CVEs.
+  risk_category: Low
+- name: Secure Software Development Lifecycle (SSDLC)
+  code: APP-015
+  domain: Application Security
+  description: Embeds security practices and gates throughout the development lifecycle.
+  risk_category: Medium
+- name: Low-Code/No-Code App Security
+  code: APP-016
+  domain: Application Security
+  description: Assesses and governs security risk in low-code/no-code applications.
+  risk_category: Low
+- name: Application Access Control
+  code: APP-017
+  domain: Application Security
+  description: Enforces fine-grained authorization within application business logic.
+  risk_category: Medium
+- name: License Compliance Scanning
+  code: APP-018
+  domain: Application Security
+  description: Detects open-source license obligations and conflicts in codebases.
+  risk_category: Low

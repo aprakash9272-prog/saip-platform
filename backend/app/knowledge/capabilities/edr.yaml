@@ -1,5 +1,0 @@
-name: Endpoint Detection & Response
-code: EDR-001
-domain: Endpoint Security
-description: Continuous monitoring and automated response to endpoint threats.
-risk_category: Threat Detection

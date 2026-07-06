@@ -7,6 +7,7 @@ export type ResourceKey =
   | "products"
   | "editions"
   | "modules"
+  | "domains"
   | "capabilities"
   | "frameworks"
   | "mappings";

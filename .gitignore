@@ -3,6 +3,12 @@ __pycache__/
 *.py[codz]
 *$py.class
 
+# Knowledge base YAML export output (generated, not source)
+backend/exports/
+
+# Local Claude Code session state (machine-specific, not project source)
+.claude/
+
 # C extensions
 *.so
 

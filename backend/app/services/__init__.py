@@ -1,4 +1,5 @@
 from app.services.capability import CapabilityService
+from app.services.domain import DomainService
 from app.services.edition import EditionService
 from app.services.framework import FrameworkService
 from app.services.framework_mapping import FrameworkMappingService
@@ -11,6 +12,7 @@ __all__ = [
     "ProductService",
     "EditionService",
     "ModuleService",
+    "DomainService",
     "CapabilityService",
     "FrameworkService",
     "FrameworkMappingService",

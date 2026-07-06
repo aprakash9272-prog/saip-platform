@@ -1,0 +1,90 @@
+- name: Security Policy Management
+  code: GRC-001
+  domain: Governance, Risk & Compliance
+  description: Authors, publishes, and tracks acknowledgment of security policies.
+  risk_category: Critical
+- name: Regulatory Compliance Management
+  code: GRC-002
+  domain: Governance, Risk & Compliance
+  description: Tracks compliance obligations across applicable regulations.
+  risk_category: High
+- name: Risk Register & Risk Assessment
+  code: GRC-003
+  domain: Governance, Risk & Compliance
+  description: Documents and assesses organizational security risks.
+  risk_category: Critical
+- name: Control Framework Mapping
+  code: GRC-004
+  domain: Governance, Risk & Compliance
+  description: Maps internal controls to external frameworks and standards.
+  risk_category: High
+- name: Audit Management
+  code: GRC-005
+  domain: Governance, Risk & Compliance
+  description: Plans, tracks, and remediates findings from internal and external audits.
+  risk_category: Critical
+- name: Security Awareness Training Platform
+  code: GRC-006
+  domain: Governance, Risk & Compliance
+  description: Delivers and tracks security awareness training for employees.
+  risk_category: High
+- name: Third-Party / Vendor Risk Management
+  code: GRC-007
+  domain: Governance, Risk & Compliance
+  description: Assesses and monitors security risk posed by vendors and partners.
+  risk_category: Medium
+- name: Continuous Control Monitoring
+  code: GRC-008
+  domain: Governance, Risk & Compliance
+  description: Continuously validates that security controls remain operating effectively.
+  risk_category: Medium
+- name: Security Maturity Assessment
+  code: GRC-009
+  domain: Governance, Risk & Compliance
+  description: Benchmarks security program maturity against a reference model.
+  risk_category: Medium
+- name: Policy Exception Management
+  code: GRC-010
+  domain: Governance, Risk & Compliance
+  description: Tracks and approves exceptions to security policy.
+  risk_category: Medium
+- name: Regulatory Change Tracking
+  code: GRC-011
+  domain: Governance, Risk & Compliance
+  description: Monitors changes in regulation relevant to the organization.
+  risk_category: Medium
+- name: Board & Executive Risk Reporting
+  code: GRC-012
+  domain: Governance, Risk & Compliance
+  description: Produces risk reporting tailored for board and executive audiences.
+  risk_category: Medium
+- name: Cyber Insurance Risk Quantification
+  code: GRC-013
+  domain: Governance, Risk & Compliance
+  description: Quantifies cyber risk to support insurance underwriting decisions.
+  risk_category: Medium
+- name: Data Privacy Compliance Management
+  code: GRC-014
+  domain: Governance, Risk & Compliance
+  description: Tracks compliance with data privacy laws and regulations.
+  risk_category: Low
+- name: Compliance Evidence Collection Automation
+  code: GRC-015
+  domain: Governance, Risk & Compliance
+  description: Automates gathering of evidence for compliance audits.
+  risk_category: Medium
+- name: Security Questionnaire Automation
+  code: GRC-016
+  domain: Governance, Risk & Compliance
+  description: Automates responses to customer and vendor security questionnaires.
+  risk_category: Low
+- name: Contract & SLA Security Requirements Tracking
+  code: GRC-017
+  domain: Governance, Risk & Compliance
+  description: Tracks security obligations embedded in contracts and SLAs.
+  risk_category: Medium
+- name: Whistleblower / Ethics Reporting Security
+  code: GRC-018
+  domain: Governance, Risk & Compliance
+  description: Secures confidential channels for ethics and compliance reporting.
+  risk_category: Low

@@ -41,10 +41,15 @@ class ModuleYAML(BaseModel):
     )
 
 
+class DomainYAML(BaseModel):
+    name: str = Field(min_length=1)
+    description: Optional[str] = None
+
+
 class CapabilityYAML(BaseModel):
     name: str = Field(min_length=1)
     code: str = Field(min_length=1)
-    domain: Optional[str] = None
+    domain: str = Field(min_length=1, description="Domain name this capability belongs to.")
     description: Optional[str] = None
     risk_category: Optional[str] = None
 

@@ -1,0 +1,47 @@
+- name: Identity & Access Management
+  description: Controls for authenticating users and services and governing what they
+    can access.
+- name: Endpoint Security
+  description: Protection, detection, and response capabilities for laptops, desktops,
+    servers, and mobile endpoints.
+- name: Network Security
+  description: Controls that protect network traffic, perimeter, and internal segments
+    from compromise.
+- name: Cloud Security
+  description: Posture, workload, and configuration security for public and hybrid
+    cloud environments.
+- name: Application Security
+  description: Testing, protection, and governance capabilities across the application
+    lifecycle.
+- name: Data Security & Privacy
+  description: Discovery, classification, protection, and lifecycle governance of
+    sensitive data.
+- name: Threat Intelligence
+  description: Collection, enrichment, and dissemination of intelligence on threats
+    and adversaries.
+- name: Security Operations & Incident Response
+  description: Detection, investigation, and response capabilities run by security
+    operations teams.
+- name: Vulnerability & Exposure Management
+  description: Discovery, prioritization, and remediation of vulnerabilities and exposures.
+- name: Governance, Risk & Compliance
+  description: Policy, risk, audit, and compliance management capabilities.
+- name: Email & Collaboration Security
+  description: Protection for email, messaging, and collaboration platforms.
+- name: Zero Trust & Network Access
+  description: Continuous verification and least-privilege access enforcement for
+    users, devices, and workloads.
+- name: DevSecOps & Software Supply Chain Security
+  description: Security embedded into CI/CD pipelines and the software supply chain.
+- name: API Security
+  description: Discovery, protection, and governance capabilities for APIs.
+- name: Container & Kubernetes Security
+  description: Security across container images, runtimes, and Kubernetes orchestration.
+- name: IoT & OT Security
+  description: Security monitoring and protection for industrial control systems and
+    connected devices.
+- name: Encryption & Key Management
+  description: Cryptographic protection of data and the systems that manage keys and
+    certificates.
+- name: Business Continuity & Disaster Recovery
+  description: Capabilities that ensure resilience and recovery from disruptive events.
