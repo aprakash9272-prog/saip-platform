@@ -1,0 +1,7 @@
+name: Singularity XDR
+vendor: SentinelOne
+product: Singularity
+edition: Complete
+description: Extended detection and response across endpoint, cloud, and identity.
+capabilities:
+  - EDR-001

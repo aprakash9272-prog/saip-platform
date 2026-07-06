@@ -1,0 +1,67 @@
+from typing import Any, Generic, Optional, Sequence, Type, TypeVar
+
+from sqlalchemy import func, or_
+from sqlmodel import Session, SQLModel, select
+
+ModelType = TypeVar("ModelType", bound=SQLModel)
+
+
+class BaseRepository(Generic[ModelType]):
+    """Generic data-access layer shared by every knowledge base entity."""
+
+    search_fields: Sequence[str] = ()
+
+    def __init__(self, session: Session, model: Type[ModelType]):
+        self.session = session
+        self.model = model
+
+    def get(self, id_: int) -> Optional[ModelType]:
+        return self.session.get(self.model, id_)
+
+    def get_by(self, **filters: Any) -> Optional[ModelType]:
+        statement = select(self.model)
+        for field, value in filters.items():
+            statement = statement.where(getattr(self.model, field) == value)
+        return self.session.exec(statement).first()
+
+    def list(
+        self,
+        *,
+        skip: int = 0,
+        limit: int = 50,
+        search: Optional[str] = None,
+    ) -> tuple[list[ModelType], int]:
+        statement = select(self.model)
+        count_statement = select(func.count()).select_from(self.model)
+
+        if search and self.search_fields:
+            conditions = [
+                getattr(self.model, field).ilike(f"%{search}%")
+                for field in self.search_fields
+            ]
+            statement = statement.where(or_(*conditions))
+            count_statement = count_statement.where(or_(*conditions))
+
+        total = self.session.exec(count_statement).one()
+        items = self.session.exec(
+            statement.offset(skip).limit(limit).order_by(self.model.id)
+        ).all()
+        return list(items), total
+
+    def create(self, obj: ModelType) -> ModelType:
+        self.session.add(obj)
+        self.session.commit()
+        self.session.refresh(obj)
+        return obj
+
+    def update(self, db_obj: ModelType, data: dict) -> ModelType:
+        for field, value in data.items():
+            setattr(db_obj, field, value)
+        self.session.add(db_obj)
+        self.session.commit()
+        self.session.refresh(db_obj)
+        return db_obj
+
+    def delete(self, db_obj: ModelType) -> None:
+        self.session.delete(db_obj)
+        self.session.commit()

@@ -1,5 +1,6 @@
 .PHONY: help up down build logs ps \
-	backend-install backend-run backend-migrate backend-revision backend-lint \
+	backend-install backend-run backend-migrate backend-revision backend-lint backend-test \
+	kb-import kb-import-dry-run \
 	frontend-install frontend-dev frontend-build frontend-lint
 
 help:
@@ -16,6 +17,10 @@ help:
 	@echo "  make backend-migrate     Apply Alembic migrations"
 	@echo "  make backend-revision    Generate a new Alembic revision (msg=\"...\")"
 	@echo "  make backend-lint        Lint the backend"
+	@echo "  make backend-test        Run the backend test suite (pytest)"
+	@echo ""
+	@echo "  make kb-import           Import the security knowledge base from YAML"
+	@echo "  make kb-import-dry-run   Validate the knowledge base without writing to the DB"
 	@echo ""
 	@echo "  make frontend-install    Install frontend dependencies"
 	@echo "  make frontend-dev        Run the frontend dev server"
@@ -51,6 +56,15 @@ backend-revision:
 
 backend-lint:
 	cd backend && . .venv/bin/activate && ruff check .
+
+backend-test:
+	cd backend && . .venv/bin/activate && pip install -q -r requirements-dev.txt && python -m pytest -q
+
+kb-import:
+	cd backend && . .venv/bin/activate && python -m app.knowledge.import_all
+
+kb-import-dry-run:
+	cd backend && . .venv/bin/activate && python -m app.knowledge.import_all --dry-run
 
 frontend-install:
 	cd frontend && npm install

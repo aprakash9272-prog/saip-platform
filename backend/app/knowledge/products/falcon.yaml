@@ -1,0 +1,5 @@
+name: Falcon
+vendor: CrowdStrike
+category: Endpoint Security
+description: CrowdStrike's unified endpoint protection platform.
+website: https://www.crowdstrike.com/falcon-platform/

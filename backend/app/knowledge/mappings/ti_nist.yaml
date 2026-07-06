@@ -1,0 +1,5 @@
+capability_code: TI-001
+framework: NIST Cybersecurity Framework
+framework_version: "2.0"
+control_id: ID.RA-02
+control_name: Cyber threat intelligence is received from information sharing forums and sources

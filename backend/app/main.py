@@ -1,10 +1,25 @@
 import logging
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request, status
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 
-from app.api.routes import health
+from app.api.routes import (
+    capabilities,
+    editions,
+    frameworks,
+    health,
+    mappings,
+    modules,
+    products,
+    vendors,
+)
 from app.core.config import settings
+from app.core.exceptions import (
+    DuplicateEntityError,
+    EntityNotFoundError,
+    InvalidReferenceError,
+)
 from app.core.logging import configure_logging
 
 configure_logging()
@@ -27,7 +42,34 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
+@app.exception_handler(EntityNotFoundError)
+def entity_not_found_handler(request: Request, exc: EntityNotFoundError) -> JSONResponse:
+    return JSONResponse(status_code=status.HTTP_404_NOT_FOUND, content={"detail": str(exc)})
+
+
+@app.exception_handler(DuplicateEntityError)
+def duplicate_entity_handler(request: Request, exc: DuplicateEntityError) -> JSONResponse:
+    return JSONResponse(status_code=status.HTTP_409_CONFLICT, content={"detail": str(exc)})
+
+
+@app.exception_handler(InvalidReferenceError)
+def invalid_reference_handler(
+    request: Request, exc: InvalidReferenceError
+) -> JSONResponse:
+    return JSONResponse(
+        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, content={"detail": str(exc)}
+    )
+
+
 app.include_router(health.router)
+app.include_router(vendors.router)
+app.include_router(products.router)
+app.include_router(editions.router)
+app.include_router(modules.router)
+app.include_router(capabilities.router)
+app.include_router(frameworks.router)
+app.include_router(mappings.router)
 
 
 @app.on_event("startup")

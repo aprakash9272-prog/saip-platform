@@ -1,0 +1,8 @@
+name: Falcon Insight EDR
+vendor: CrowdStrike
+product: Falcon
+edition: Enterprise
+description: Endpoint detection and response module built into Falcon.
+capabilities:
+  - EDR-001
+  - TI-001

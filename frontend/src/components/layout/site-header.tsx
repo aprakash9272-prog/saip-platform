@@ -9,9 +9,10 @@ import { SidebarTrigger } from "@/components/ui/sidebar";
 
 function useCurrentPageTitle(): string {
   const pathname = usePathname();
-  const match = NAV_ITEMS.find((item) =>
-    item.href === "/" ? pathname === "/" : pathname.startsWith(item.href),
-  );
+  const flat = NAV_ITEMS.flatMap((item) => [item, ...(item.children ?? [])]);
+  const match = flat
+    .filter((item) => (item.href === "/" ? pathname === "/" : pathname.startsWith(item.href)))
+    .sort((a, b) => b.href.length - a.href.length)[0];
   return match?.title ?? "Dashboard";
 }
 

@@ -1,0 +1,1 @@
+"""Modules knowledge namespace."""

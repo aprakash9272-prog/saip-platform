@@ -1,0 +1,5 @@
+name: Enterprise
+vendor: CrowdStrike
+product: Falcon
+tier: Enterprise
+description: Falcon Enterprise bundle with EDR, threat intelligence, and identity protection.

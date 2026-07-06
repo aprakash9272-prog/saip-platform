@@ -1,0 +1,5 @@
+name: Threat Intelligence
+code: TI-001
+domain: Threat Intelligence
+description: Curated indicators and adversary intelligence to contextualize alerts.
+risk_category: Intelligence

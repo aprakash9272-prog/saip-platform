@@ -6,8 +6,7 @@ from sqlmodel import SQLModel
 
 from app.core.config import settings
 
-# Import models here so they are registered on SQLModel.metadata for autogenerate.
-# from app.models import ...  # noqa: E402
+import app.models  # noqa: E402, F401  (registers all tables on SQLModel.metadata)
 
 config = context.config
 config.set_main_option("sqlalchemy.url", settings.DATABASE_URL)

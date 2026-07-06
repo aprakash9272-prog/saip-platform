@@ -1,0 +1,5 @@
+capability_code: EDR-001
+framework: NIST Cybersecurity Framework
+framework_version: "2.0"
+control_id: DE.CM-01
+control_name: Networks and network services are monitored to find potentially adverse events
