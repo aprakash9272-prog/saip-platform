@@ -1,0 +1,10 @@
+name: Defender for Endpoint
+vendor: Microsoft
+product: Microsoft Defender XDR
+edition: Plan 2
+description: Endpoint detection and response and identity threat protection for Defender
+  XDR.
+capabilities:
+- EDR-001
+- IAM-010
+- SOC-003

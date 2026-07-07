@@ -10,7 +10,8 @@ export type ResourceKey =
   | "domains"
   | "capabilities"
   | "frameworks"
-  | "mappings";
+  | "mappings"
+  | "product-mappings";
 
 export interface ReferenceConfig {
   resourceKey: ResourceKey;
@@ -20,10 +21,19 @@ export interface ReferenceConfig {
 export interface FieldConfig {
   name: string;
   label: string;
-  type: "text" | "textarea" | "number" | "reference" | "multi-reference";
+  type:
+    | "text"
+    | "textarea"
+    | "number"
+    | "reference"
+    | "multi-reference"
+    | "select"
+    | "multi-select";
   required?: boolean;
   placeholder?: string;
   reference?: ReferenceConfig;
+  /** Fixed choice list for "select" / "multi-select" fields. */
+  options?: readonly string[];
 }
 
 export interface ColumnConfig<TRead> {

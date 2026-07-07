@@ -1,0 +1,10 @@
+name: Splunk ES
+vendor: Splunk
+product: Splunk Enterprise Security
+edition: Enterprise
+description: Security information and event management with log management and behavior
+  analytics.
+capabilities:
+- SOC-001
+- SOC-007
+- SOC-008

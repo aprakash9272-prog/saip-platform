@@ -1,0 +1,33 @@
+- vendor: Microsoft
+  product: Microsoft Defender XDR
+  edition: Plan 2
+  module: Defender for Endpoint
+  capability_code: EDR-001
+  licensing_tier: Plan 2
+  supported_platforms:
+  - Windows
+  - macOS
+  - Linux
+  - Mobile
+  deployment_model: Agent
+  availability_status: Generally Available
+- vendor: Microsoft
+  product: Microsoft Defender XDR
+  edition: Plan 2
+  module: Defender for Endpoint
+  capability_code: IAM-010
+  licensing_tier: Plan 2
+  supported_platforms:
+  - Cloud
+  deployment_model: SaaS
+  availability_status: Generally Available
+- vendor: Microsoft
+  product: Microsoft Defender XDR
+  edition: Plan 2
+  module: Defender for Endpoint
+  capability_code: SOC-003
+  licensing_tier: Plan 2
+  supported_platforms:
+  - Cloud
+  deployment_model: SaaS
+  availability_status: Generally Available

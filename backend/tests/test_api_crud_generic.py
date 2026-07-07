@@ -9,6 +9,7 @@ RESOURCES = [
     "capabilities",
     "frameworks",
     "mappings",
+    "product-mappings",
 ]
 
 

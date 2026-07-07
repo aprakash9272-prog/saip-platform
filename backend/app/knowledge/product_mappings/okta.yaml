@@ -1,0 +1,31 @@
+- vendor: Okta
+  product: Okta Workforce Identity Cloud
+  edition: Enterprise
+  module: Okta SSO & MFA
+  capability_code: IAM-001
+  licensing_tier: Enterprise
+  supported_platforms:
+  - Cloud
+  deployment_model: SaaS
+  availability_status: Generally Available
+- vendor: Okta
+  product: Okta Workforce Identity Cloud
+  edition: Enterprise
+  module: Okta SSO & MFA
+  capability_code: IAM-002
+  licensing_tier: Enterprise
+  supported_platforms:
+  - Cloud
+  - Mobile
+  deployment_model: SaaS
+  availability_status: Generally Available
+- vendor: Okta
+  product: Okta Workforce Identity Cloud
+  edition: Enterprise
+  module: Okta SSO & MFA
+  capability_code: IAM-010
+  licensing_tier: Enterprise
+  supported_platforms:
+  - Cloud
+  deployment_model: SaaS
+  availability_status: Beta

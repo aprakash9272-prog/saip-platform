@@ -133,6 +133,68 @@ function MultiReferenceField({
   );
 }
 
+function FixedSelectField({
+  field,
+  value,
+  onChange,
+}: {
+  field: FieldConfig;
+  value: unknown;
+  onChange: (value: string) => void;
+}) {
+  const currentValue = value !== undefined && value !== null ? String(value) : "";
+
+  return (
+    <Select value={currentValue} onValueChange={onChange}>
+      <SelectTrigger id={field.name} className="w-full">
+        <SelectValue placeholder={`Select ${field.label.toLowerCase()}`} />
+      </SelectTrigger>
+      <SelectContent>
+        {(field.options ?? []).map((option) => (
+          <SelectItem key={option} value={option}>
+            {option}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
+  );
+}
+
+function FixedMultiSelectField({
+  field,
+  value,
+  onChange,
+}: {
+  field: FieldConfig;
+  value: unknown;
+  onChange: (value: string[]) => void;
+}) {
+  const selected = new Set(Array.isArray(value) ? (value as string[]) : []);
+
+  const toggle = (option: string) => {
+    const next = new Set(selected);
+    if (next.has(option)) next.delete(option);
+    else next.add(option);
+    onChange(Array.from(next));
+  };
+
+  return (
+    <div className="flex flex-wrap gap-3 rounded-md border p-2">
+      {(field.options ?? []).map((option) => (
+        <label key={option} className="flex items-center gap-2 text-sm">
+          <input
+            type="checkbox"
+            checked={selected.has(option)}
+            onChange={() => toggle(option)}
+            className="size-4 rounded border-input"
+          />
+          {option}
+        </label>
+      ))}
+    </div>
+  );
+}
+
 export function EntityFormDialog({
   open,
   onOpenChange,
@@ -204,6 +266,24 @@ export function EntityFormDialog({
                   if (field.type === "multi-reference") {
                     return (
                       <MultiReferenceField
+                        field={field}
+                        value={rhfField.value}
+                        onChange={rhfField.onChange}
+                      />
+                    );
+                  }
+                  if (field.type === "select") {
+                    return (
+                      <FixedSelectField
+                        field={field}
+                        value={rhfField.value}
+                        onChange={rhfField.onChange}
+                      />
+                    );
+                  }
+                  if (field.type === "multi-select") {
+                    return (
+                      <FixedMultiSelectField
                         field={field}
                         value={rhfField.value}
                         onChange={rhfField.onChange}

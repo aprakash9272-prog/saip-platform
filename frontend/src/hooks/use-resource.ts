@@ -36,12 +36,17 @@ export function useResourceQueries<TRead, TCreate, TUpdate>(
   return { listQuery, createMutation, updateMutation, deleteMutation };
 }
 
+// Used to build id -> label reference maps and select-field option lists, so
+// this must cover every row (the capability catalog alone has 300+), not just
+// one page of results.
+const OPTIONS_LIMIT = 500;
+
 export function useResourceOptions<TRead>(
   key: string,
   api: ResourceApi<TRead, unknown, unknown>,
 ) {
   return useQuery({
     queryKey: [key, "options"],
-    queryFn: () => api.list({ limit: 200 }),
+    queryFn: () => api.list({ limit: OPTIONS_LIMIT }),
   });
 }

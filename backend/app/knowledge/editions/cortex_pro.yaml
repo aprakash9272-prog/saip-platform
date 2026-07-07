@@ -1,0 +1,6 @@
+name: Pro
+vendor: Palo Alto Networks
+product: Cortex XDR
+tier: Pro
+description: Pro tier with full analytics, endpoint protection, and managed threat
+  hunting.

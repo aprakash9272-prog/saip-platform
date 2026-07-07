@@ -12,6 +12,7 @@ from app.api.routes import (
     health,
     mappings,
     modules,
+    product_mappings,
     products,
     vendors,
 )
@@ -72,6 +73,7 @@ app.include_router(domains.router)
 app.include_router(capabilities.router)
 app.include_router(frameworks.router)
 app.include_router(mappings.router)
+app.include_router(product_mappings.router)
 
 
 @app.on_event("startup")

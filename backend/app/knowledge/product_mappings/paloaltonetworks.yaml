@@ -1,0 +1,23 @@
+- vendor: Palo Alto Networks
+  product: Cortex XDR
+  edition: Pro
+  module: Cortex XDR Analytics
+  capability_code: EDR-001
+  licensing_tier: Pro
+  supported_platforms:
+  - Windows
+  - macOS
+  - Linux
+  - Cloud
+  deployment_model: Hybrid
+  availability_status: Generally Available
+- vendor: Palo Alto Networks
+  product: Cortex XDR
+  edition: Pro
+  module: Cortex XDR Analytics
+  capability_code: SOC-003
+  licensing_tier: Pro
+  supported_platforms:
+  - Cloud
+  deployment_model: SaaS
+  availability_status: Generally Available

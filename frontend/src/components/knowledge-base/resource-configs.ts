@@ -7,6 +7,7 @@ import {
   frameworksApi,
   mappingsApi,
   modulesApi,
+  productMappingsApi,
   productsApi,
   vendorsApi,
 } from "@/lib/api/resources";
@@ -24,9 +25,16 @@ import type {
   Module,
   ModuleInput,
   Product,
+  ProductCapabilityMapping,
+  ProductCapabilityMappingInput,
   ProductInput,
   Vendor,
   VendorInput,
+} from "@/lib/api/types";
+import {
+  AVAILABILITY_STATUSES,
+  DEPLOYMENT_MODELS,
+  PLATFORMS,
 } from "@/lib/api/types";
 
 import type { ResourceConfig, ResourceKey } from "./types";
@@ -428,6 +436,138 @@ const mappingConfig: ResourceConfig<FrameworkMapping, FrameworkMappingInput, Par
   }),
 };
 
+// ------------------------------------------------------- Product Mappings --
+
+export const productMappingCreateSchema = z.object({
+  vendor_id: z.coerce.number({ error: "Vendor is required" }).int().positive(),
+  product_id: z.coerce.number({ error: "Product is required" }).int().positive(),
+  edition_id: z.coerce.number({ error: "Edition is required" }).int().positive(),
+  module_id: z.coerce.number({ error: "Module is required" }).int().positive(),
+  capability_id: z.coerce.number({ error: "Capability is required" }).int().positive(),
+  licensing_tier: optionalText,
+  supported_platforms: z.array(z.string()).default([]),
+  deployment_model: z.string().min(1, "Deployment model is required"),
+  availability_status: z.string().min(1, "Availability status is required"),
+});
+export const productMappingUpdateSchema = productMappingCreateSchema.partial();
+
+const productMappingConfig: ResourceConfig<
+  ProductCapabilityMapping,
+  ProductCapabilityMappingInput,
+  Partial<ProductCapabilityMappingInput>
+> = {
+  key: "product-mappings",
+  title: "Product Mappings",
+  description:
+    "The core mapping layer between vendors, products, editions, modules, and the capabilities they provide.",
+  labelField: "id",
+  api: productMappingsApi,
+  searchPlaceholder: "Search mappings by licensing tier, deployment, or status...",
+  createSchema: productMappingCreateSchema,
+  updateSchema: productMappingUpdateSchema,
+  columns: [
+    {
+      key: "vendor_id",
+      header: "Vendor",
+      render: (item, refs) => refs.vendors?.get(item.vendor_id) ?? item.vendor_id,
+    },
+    {
+      key: "product_id",
+      header: "Product",
+      render: (item, refs) => refs.products?.get(item.product_id) ?? item.product_id,
+    },
+    {
+      key: "module_id",
+      header: "Module",
+      render: (item, refs) => refs.modules?.get(item.module_id) ?? item.module_id,
+    },
+    {
+      key: "capability_id",
+      header: "Capability",
+      render: (item, refs) =>
+        refs.capabilities?.get(item.capability_id) ?? item.capability_id,
+    },
+    { key: "licensing_tier", header: "Tier" },
+    { key: "deployment_model", header: "Deployment" },
+    { key: "availability_status", header: "Status" },
+    {
+      key: "supported_platforms",
+      header: "Platforms",
+      render: (item) =>
+        item.supported_platforms.length ? item.supported_platforms.join(", ") : "—",
+    },
+  ],
+  fields: [
+    {
+      name: "vendor_id",
+      label: "Vendor",
+      type: "reference",
+      required: true,
+      reference: { resourceKey: "vendors", labelField: "name" },
+    },
+    {
+      name: "product_id",
+      label: "Product",
+      type: "reference",
+      required: true,
+      reference: { resourceKey: "products", labelField: "name" },
+    },
+    {
+      name: "edition_id",
+      label: "Edition",
+      type: "reference",
+      required: true,
+      reference: { resourceKey: "editions", labelField: "name" },
+    },
+    {
+      name: "module_id",
+      label: "Module",
+      type: "reference",
+      required: true,
+      reference: { resourceKey: "modules", labelField: "name" },
+    },
+    {
+      name: "capability_id",
+      label: "Capability",
+      type: "reference",
+      required: true,
+      reference: { resourceKey: "capabilities", labelField: "name" },
+    },
+    { name: "licensing_tier", label: "Licensing Tier", type: "text", placeholder: "Enterprise" },
+    {
+      name: "supported_platforms",
+      label: "Supported Platforms",
+      type: "multi-select",
+      options: PLATFORMS,
+    },
+    {
+      name: "deployment_model",
+      label: "Deployment Model",
+      type: "select",
+      required: true,
+      options: DEPLOYMENT_MODELS,
+    },
+    {
+      name: "availability_status",
+      label: "Availability Status",
+      type: "select",
+      required: true,
+      options: AVAILABILITY_STATUSES,
+    },
+  ],
+  toFormValues: (item) => ({
+    vendor_id: item.vendor_id,
+    product_id: item.product_id,
+    edition_id: item.edition_id,
+    module_id: item.module_id,
+    capability_id: item.capability_id,
+    licensing_tier: item.licensing_tier ?? "",
+    supported_platforms: item.supported_platforms,
+    deployment_model: item.deployment_model,
+    availability_status: item.availability_status,
+  }),
+};
+
 export const RESOURCE_REGISTRY: Record<ResourceKey, ResourceConfig> = {
   vendors: vendorConfig,
   products: productConfig,
@@ -437,4 +577,5 @@ export const RESOURCE_REGISTRY: Record<ResourceKey, ResourceConfig> = {
   capabilities: capabilityConfig,
   frameworks: frameworkConfig,
   mappings: mappingConfig,
+  "product-mappings": productMappingConfig,
 };

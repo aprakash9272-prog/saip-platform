@@ -101,6 +101,21 @@ def _build_valid_kb(root: Path) -> None:
         control_name: Test control.
         """,
     )
+    _write(
+        root / "product_mappings",
+        "pm.yaml",
+        """
+        vendor: Acme
+        product: Shield
+        edition: Pro
+        module: Detector
+        capability_code: EDR-100
+        licensing_tier: Enterprise
+        supported_platforms: [Windows, Cloud]
+        deployment_model: Agent
+        availability_status: Generally Available
+        """,
+    )
 
 
 def test_import_all_creates_expected_rows(session, tmp_path):
@@ -116,6 +131,7 @@ def test_import_all_creates_expected_rows(session, tmp_path):
     assert result.frameworks.created == 1
     assert result.mappings.created == 1
     assert result.module_capability_links.updated == 1
+    assert result.product_capability_mappings.created == 1
 
     vendor = session.exec(select(Vendor)).one()
     assert vendor.name == "Acme"
@@ -229,6 +245,43 @@ def test_import_rejects_duplicate_domain_in_batch(session, tmp_path):
         KnowledgeImporter(session).import_all(tmp_path)
 
 
+def test_import_rejects_missing_module_reference_for_product_mapping(session, tmp_path):
+    _build_valid_kb(tmp_path)
+    _write(
+        tmp_path / "product_mappings",
+        "pm2.yaml",
+        """
+        vendor: Acme
+        product: Shield
+        edition: Pro
+        module: DoesNotExist
+        capability_code: EDR-100
+        deployment_model: Agent
+        """,
+    )
+    with pytest.raises(ReferenceNotFoundError):
+        KnowledgeImporter(session).import_all(tmp_path)
+
+
+def test_import_rejects_duplicate_product_mapping_in_batch(session, tmp_path):
+    _build_valid_kb(tmp_path)
+    _write(
+        tmp_path / "product_mappings",
+        "pm_dup.yaml",
+        """
+        vendor: Acme
+        product: Shield
+        edition: Pro
+        module: Detector
+        capability_code: EDR-100
+        licensing_tier: Enterprise
+        deployment_model: Agent
+        """,
+    )
+    with pytest.raises(DuplicateInBatchError):
+        KnowledgeImporter(session).import_all(tmp_path)
+
+
 def test_import_rejects_missing_mandatory_field(session, tmp_path):
     _write(tmp_path / "vendors", "v.yaml", "website: https://example.com\n")
     with pytest.raises(YAMLValidationError):
@@ -240,11 +293,12 @@ def test_sample_knowledge_base_imports_cleanly(session):
     sample_path = backend_root / "app" / "knowledge"
     result = KnowledgeImporter(session).import_all(sample_path)
 
-    assert result.vendors.created == 2
-    assert result.products.created == 2
-    assert result.editions.created == 2
-    assert result.modules.created == 2
+    assert result.vendors.created == 7
+    assert result.products.created == 7
+    assert result.editions.created == 7
+    assert result.modules.created == 7
     assert result.domains.created == 18
     assert result.capabilities.created == 324
     assert result.frameworks.created == 1
     assert result.mappings.created == 2
+    assert result.product_capability_mappings.created == 16

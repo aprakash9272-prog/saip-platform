@@ -1,0 +1,32 @@
+- vendor: Splunk
+  product: Splunk Enterprise Security
+  edition: Enterprise
+  module: Splunk ES
+  capability_code: SOC-001
+  licensing_tier: Enterprise
+  supported_platforms:
+  - Windows
+  - Linux
+  - Cloud
+  deployment_model: Hybrid
+  availability_status: Generally Available
+- vendor: Splunk
+  product: Splunk Enterprise Security
+  edition: Enterprise
+  module: Splunk ES
+  capability_code: SOC-007
+  licensing_tier: Enterprise
+  supported_platforms:
+  - Cloud
+  deployment_model: SaaS
+  availability_status: Generally Available
+- vendor: Splunk
+  product: Splunk Enterprise Security
+  edition: Enterprise
+  module: Splunk ES
+  capability_code: SOC-008
+  licensing_tier: Enterprise
+  supported_platforms:
+  - Cloud
+  deployment_model: SaaS
+  availability_status: Beta

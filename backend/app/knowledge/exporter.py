@@ -4,6 +4,7 @@ import yaml
 
 from app.models.capability import Capability
 from app.models.domain import Domain
+from app.models.product_capability_mapping import ProductCapabilityMapping
 
 
 def dump_domains_yaml(domains: List[Domain]) -> str:
@@ -24,5 +25,26 @@ def dump_capabilities_yaml(capabilities: List[Capability]) -> str:
             "risk_category": c.risk_category,
         }
         for c in sorted(capabilities, key=lambda c: c.code)
+    ]
+    return yaml.safe_dump(records, sort_keys=False, allow_unicode=True)
+
+
+def dump_product_mappings_yaml(mappings: List[ProductCapabilityMapping]) -> str:
+    records = [
+        {
+            "vendor": m.vendor.name,
+            "product": m.product.name,
+            "edition": m.edition.name,
+            "module": m.module.name,
+            "capability_code": m.capability.code,
+            "licensing_tier": m.licensing_tier,
+            "supported_platforms": m.supported_platforms,
+            "deployment_model": m.deployment_model,
+            "availability_status": m.availability_status,
+        }
+        for m in sorted(
+            mappings,
+            key=lambda m: (m.vendor.name, m.product.name, m.module.name, m.capability.code),
+        )
     ]
     return yaml.safe_dump(records, sort_keys=False, allow_unicode=True)

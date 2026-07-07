@@ -5,6 +5,7 @@ from app.repositories.framework import FrameworkRepository
 from app.repositories.framework_mapping import FrameworkMappingRepository
 from app.repositories.module import ModuleRepository
 from app.repositories.product import ProductRepository
+from app.repositories.product_capability_mapping import ProductCapabilityMappingRepository
 from app.repositories.vendor import VendorRepository
 
 __all__ = [
@@ -16,4 +17,5 @@ __all__ = [
     "CapabilityRepository",
     "FrameworkRepository",
     "FrameworkMappingRepository",
+    "ProductCapabilityMappingRepository",
 ]

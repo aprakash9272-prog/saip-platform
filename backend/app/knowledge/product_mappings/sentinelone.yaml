@@ -1,0 +1,13 @@
+- vendor: SentinelOne
+  product: Singularity
+  edition: Complete
+  module: Singularity XDR
+  capability_code: EDR-001
+  licensing_tier: Complete
+  supported_platforms:
+  - Windows
+  - macOS
+  - Linux
+  - Cloud
+  deployment_model: Agent
+  availability_status: Generally Available

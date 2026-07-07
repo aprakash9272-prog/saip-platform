@@ -1,0 +1,23 @@
+- vendor: CrowdStrike
+  product: Falcon
+  edition: Enterprise
+  module: Falcon Insight EDR
+  capability_code: EDR-001
+  licensing_tier: Enterprise
+  supported_platforms:
+  - Windows
+  - macOS
+  - Linux
+  - Cloud
+  deployment_model: Agent
+  availability_status: Generally Available
+- vendor: CrowdStrike
+  product: Falcon
+  edition: Enterprise
+  module: Falcon Insight EDR
+  capability_code: TI-001
+  licensing_tier: Enterprise
+  supported_platforms:
+  - Cloud
+  deployment_model: SaaS
+  availability_status: Generally Available

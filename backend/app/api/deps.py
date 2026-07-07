@@ -14,7 +14,7 @@ class PaginationParams:
     def __init__(
         self,
         skip: int = Query(0, ge=0, description="Number of records to skip."),
-        limit: int = Query(50, ge=1, le=200, description="Max records to return."),
+        limit: int = Query(50, ge=1, le=500, description="Max records to return."),
         search: Optional[str] = Query(
             None, min_length=1, max_length=200, description="Free-text search."
         ),

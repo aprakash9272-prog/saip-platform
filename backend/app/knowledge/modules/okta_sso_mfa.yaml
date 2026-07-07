@@ -1,0 +1,10 @@
+name: Okta SSO & MFA
+vendor: Okta
+product: Okta Workforce Identity Cloud
+edition: Enterprise
+description: Single sign-on, multi-factor authentication, and identity threat detection
+  for the workforce.
+capabilities:
+- IAM-001
+- IAM-002
+- IAM-010

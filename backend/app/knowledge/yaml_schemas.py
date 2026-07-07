@@ -3,6 +3,8 @@ from typing import List, Optional
 
 from pydantic import BaseModel, Field, field_validator
 
+from app.models.product_capability_mapping import AvailabilityStatus, DeploymentModel, Platform
+
 CODE_PATTERN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
 
 
@@ -75,3 +77,43 @@ class FrameworkMappingYAML(BaseModel):
     framework_version: str = Field(min_length=1)
     control_id: str = Field(min_length=1)
     control_name: str = Field(min_length=1)
+
+
+class ProductCapabilityMappingYAML(BaseModel):
+    vendor: str = Field(min_length=1)
+    product: str = Field(min_length=1)
+    edition: str = Field(min_length=1)
+    module: str = Field(min_length=1)
+    capability_code: str = Field(min_length=1)
+    licensing_tier: Optional[str] = None
+    supported_platforms: List[str] = Field(default_factory=list)
+    deployment_model: str = Field(min_length=1)
+    availability_status: str = AvailabilityStatus.GENERALLY_AVAILABLE.value
+
+    @field_validator("deployment_model")
+    @classmethod
+    def deployment_model_must_be_known(cls, value: str) -> str:
+        allowed = {item.value for item in DeploymentModel}
+        if value not in allowed:
+            raise ValueError(f"deployment_model must be one of {sorted(allowed)}")
+        return value
+
+    @field_validator("availability_status")
+    @classmethod
+    def availability_status_must_be_known(cls, value: str) -> str:
+        allowed = {item.value for item in AvailabilityStatus}
+        if value not in allowed:
+            raise ValueError(f"availability_status must be one of {sorted(allowed)}")
+        return value
+
+    @field_validator("supported_platforms")
+    @classmethod
+    def platforms_must_be_known(cls, value: List[str]) -> List[str]:
+        allowed = {item.value for item in Platform}
+        invalid = [v for v in value if v not in allowed]
+        if invalid:
+            raise ValueError(
+                f"supported_platforms contains invalid values {invalid}; "
+                f"allowed: {sorted(allowed)}"
+            )
+        return value

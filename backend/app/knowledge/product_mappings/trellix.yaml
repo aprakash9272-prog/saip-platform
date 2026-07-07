@@ -1,0 +1,22 @@
+- vendor: Trellix
+  product: Trellix XDR Platform
+  edition: Advanced
+  module: Trellix Endpoint Security
+  capability_code: EDR-001
+  licensing_tier: Advanced
+  supported_platforms:
+  - Windows
+  - macOS
+  - Linux
+  deployment_model: Agent
+  availability_status: Generally Available
+- vendor: Trellix
+  product: Trellix XDR Platform
+  edition: Advanced
+  module: Trellix Endpoint Security
+  capability_code: TI-001
+  licensing_tier: Advanced
+  supported_platforms:
+  - Cloud
+  deployment_model: SaaS
+  availability_status: Generally Available

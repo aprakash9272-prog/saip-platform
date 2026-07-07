@@ -15,9 +15,14 @@ from sqlmodel import Session
 
 from app.core.logging import configure_logging
 from app.db.session import engine
-from app.knowledge.exporter import dump_capabilities_yaml, dump_domains_yaml
+from app.knowledge.exporter import (
+    dump_capabilities_yaml,
+    dump_domains_yaml,
+    dump_product_mappings_yaml,
+)
 from app.repositories.capability import CapabilityRepository
 from app.repositories.domain import DomainRepository
+from app.repositories.product_capability_mapping import ProductCapabilityMappingRepository
 
 configure_logging()
 logger = logging.getLogger(__name__)
@@ -34,10 +39,11 @@ def main(argv: Optional[List[str]] = None) -> int:
         type=Path,
         default=DEFAULT_OUTPUT_PATH,
         help=(
-            "Output directory; writes domains/_export.yaml and "
-            "capabilities/_export.yaml (default: backend/exports/knowledge — "
-            "deliberately outside app/knowledge/ so re-running `import_all` "
-            "against the source tree never sees duplicate capability codes)."
+            "Output directory; writes domains/_export.yaml, "
+            "capabilities/_export.yaml, and product_mappings/_export.yaml "
+            "(default: backend/exports/knowledge — deliberately outside "
+            "app/knowledge/ so re-running `import_all` against the source "
+            "tree never sees duplicate records)."
         ),
     )
     args = parser.parse_args(argv)
@@ -45,18 +51,30 @@ def main(argv: Optional[List[str]] = None) -> int:
     with Session(engine) as session:
         domains = DomainRepository(session).list(skip=0, limit=1_000_000)[0]
         capabilities = CapabilityRepository(session).all()
+        product_mappings = ProductCapabilityMappingRepository(session).all()
 
         domains_dir = args.path / "domains"
         capabilities_dir = args.path / "capabilities"
+        product_mappings_dir = args.path / "product_mappings"
         domains_dir.mkdir(parents=True, exist_ok=True)
         capabilities_dir.mkdir(parents=True, exist_ok=True)
+        product_mappings_dir.mkdir(parents=True, exist_ok=True)
 
         (domains_dir / "_export.yaml").write_text(dump_domains_yaml(domains))
         (capabilities_dir / "_export.yaml").write_text(
             dump_capabilities_yaml(capabilities)
         )
+        (product_mappings_dir / "_export.yaml").write_text(
+            dump_product_mappings_yaml(product_mappings)
+        )
 
-    logger.info("Exported %d domains and %d capabilities to %s", len(domains), len(capabilities), args.path)
+    logger.info(
+        "Exported %d domains, %d capabilities, and %d product mappings to %s",
+        len(domains),
+        len(capabilities),
+        len(product_mappings),
+        args.path,
+    )
     return 0
 
 

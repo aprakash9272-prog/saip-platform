@@ -1,0 +1,6 @@
+name: Microsoft Defender XDR
+vendor: Microsoft
+category: Endpoint Security
+description: Unified pre- and post-breach enterprise defense suite across endpoints,
+  identities, email, and apps.
+website: https://www.microsoft.com/security/business/siem-and-xdr/microsoft-defender-xdr

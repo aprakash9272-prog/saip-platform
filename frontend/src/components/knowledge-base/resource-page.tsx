@@ -4,7 +4,8 @@ import { useMemo, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useResourceOptions, useResourceQueries } from "@/hooks/use-resource";
+import { useReferenceMaps } from "@/hooks/use-reference-maps";
+import { useResourceQueries } from "@/hooks/use-resource";
 import { ApiError } from "@/lib/api/client";
 
 import { DataTable } from "./data-table";
@@ -12,35 +13,12 @@ import { DeleteConfirmDialog } from "./delete-confirm-dialog";
 import { EntityDetailSheet } from "./entity-detail-sheet";
 import { EntityFormDialog } from "./entity-form-dialog";
 import { RESOURCE_REGISTRY } from "./resource-configs";
-import type { EntityRecord, ReferenceMaps, ResourceKey } from "./types";
-import { getFieldValue } from "./types";
+import type { EntityRecord, ResourceKey } from "./types";
 
 const PAGE_SIZE = 10;
 
 function singular(title: string): string {
   return title.endsWith("s") ? title.slice(0, -1) : title;
-}
-
-function useReferenceMaps(referenceKeys: ResourceKey[]): ReferenceMaps {
-  const queries = referenceKeys.map((key) =>
-    // Reference keys are a fixed, small set derived from static config, so the
-    // number of hook calls never changes across renders for a given page.
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    useResourceOptions(key, RESOURCE_REGISTRY[key].api),
-  );
-
-  return useMemo(() => {
-    const maps: ReferenceMaps = {};
-    referenceKeys.forEach((key, index) => {
-      const labelField = RESOURCE_REGISTRY[key].labelField;
-      const items = queries[index].data?.items ?? [];
-      maps[key] = new Map(
-        items.map((item) => [item.id, String(getFieldValue(item, labelField))]),
-      );
-    });
-    return maps;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [referenceKeys, ...queries.map((q) => q.data)]);
 }
 
 interface ResourcePageProps {

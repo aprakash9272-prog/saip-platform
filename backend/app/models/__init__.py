@@ -6,6 +6,13 @@ from app.models.framework_mapping import FrameworkMapping, FrameworkMappingBase
 from app.models.module import Module, ModuleBase
 from app.models.module_capability_link import ModuleCapabilityLink
 from app.models.product import Product, ProductBase
+from app.models.product_capability_mapping import (
+    AvailabilityStatus,
+    DeploymentModel,
+    Platform,
+    ProductCapabilityMapping,
+    ProductCapabilityMappingBase,
+)
 from app.models.vendor import Vendor, VendorBase
 
 __all__ = [
@@ -26,4 +33,9 @@ __all__ = [
     "FrameworkBase",
     "FrameworkMapping",
     "FrameworkMappingBase",
+    "ProductCapabilityMapping",
+    "ProductCapabilityMappingBase",
+    "DeploymentModel",
+    "AvailabilityStatus",
+    "Platform",
 ]

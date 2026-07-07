@@ -1,0 +1,8 @@
+name: Trellix Endpoint Security
+vendor: Trellix
+product: Trellix XDR Platform
+edition: Advanced
+description: Endpoint protection and detection module within the Trellix XDR platform.
+capabilities:
+- EDR-001
+- TI-001

@@ -1,0 +1,9 @@
+name: Cortex XDR Analytics
+vendor: Palo Alto Networks
+product: Cortex XDR
+edition: Pro
+description: Analytics and detection engine correlating endpoint, network, and cloud
+  telemetry.
+capabilities:
+- EDR-001
+- SOC-003

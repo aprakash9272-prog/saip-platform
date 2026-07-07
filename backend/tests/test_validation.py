@@ -7,6 +7,7 @@ from app.knowledge.yaml_schemas import (
     CapabilityYAML,
     DomainYAML,
     ModuleYAML,
+    ProductCapabilityMappingYAML,
     VendorYAML,
 )
 
@@ -63,6 +64,70 @@ def test_domain_yaml_accepts_minimal_payload():
     domain = DomainYAML.model_validate({"name": "Endpoint Security"})
     assert domain.name == "Endpoint Security"
     assert domain.description is None
+
+
+def test_product_mapping_yaml_requires_hierarchy_and_deployment_model():
+    with pytest.raises(ValidationError):
+        ProductCapabilityMappingYAML.model_validate({"vendor": "Acme"})
+
+
+def test_product_mapping_yaml_accepts_minimal_payload():
+    mapping = ProductCapabilityMappingYAML.model_validate(
+        {
+            "vendor": "Acme",
+            "product": "Shield",
+            "edition": "Pro",
+            "module": "Detector",
+            "capability_code": "EDR-100",
+            "deployment_model": "Agent",
+        }
+    )
+    assert mapping.availability_status == "Generally Available"
+    assert mapping.supported_platforms == []
+
+
+def test_product_mapping_yaml_rejects_invalid_deployment_model():
+    with pytest.raises(ValidationError):
+        ProductCapabilityMappingYAML.model_validate(
+            {
+                "vendor": "Acme",
+                "product": "Shield",
+                "edition": "Pro",
+                "module": "Detector",
+                "capability_code": "EDR-100",
+                "deployment_model": "Carrier Pigeon",
+            }
+        )
+
+
+def test_product_mapping_yaml_rejects_invalid_availability_status():
+    with pytest.raises(ValidationError):
+        ProductCapabilityMappingYAML.model_validate(
+            {
+                "vendor": "Acme",
+                "product": "Shield",
+                "edition": "Pro",
+                "module": "Detector",
+                "capability_code": "EDR-100",
+                "deployment_model": "Agent",
+                "availability_status": "Vaporware",
+            }
+        )
+
+
+def test_product_mapping_yaml_rejects_invalid_platform():
+    with pytest.raises(ValidationError):
+        ProductCapabilityMappingYAML.model_validate(
+            {
+                "vendor": "Acme",
+                "product": "Shield",
+                "edition": "Pro",
+                "module": "Detector",
+                "capability_code": "EDR-100",
+                "deployment_model": "Agent",
+                "supported_platforms": ["Amiga"],
+            }
+        )
 
 
 def test_check_for_cycles_passes_on_acyclic_graph():

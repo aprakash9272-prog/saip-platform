@@ -10,6 +10,14 @@ from app.schemas.framework_mapping import (
 )
 from app.schemas.module import ModuleCreate, ModuleRead, ModuleUpdate
 from app.schemas.product import ProductCreate, ProductRead, ProductUpdate
+from app.schemas.product_capability_mapping import (
+    BulkOperationResult,
+    ProductCapabilityMappingBulkDelete,
+    ProductCapabilityMappingBulkUpdate,
+    ProductCapabilityMappingCreate,
+    ProductCapabilityMappingRead,
+    ProductCapabilityMappingUpdate,
+)
 from app.schemas.vendor import VendorCreate, VendorRead, VendorUpdate
 
 __all__ = [
@@ -38,4 +46,10 @@ __all__ = [
     "FrameworkMappingCreate",
     "FrameworkMappingRead",
     "FrameworkMappingUpdate",
+    "ProductCapabilityMappingCreate",
+    "ProductCapabilityMappingRead",
+    "ProductCapabilityMappingUpdate",
+    "ProductCapabilityMappingBulkUpdate",
+    "ProductCapabilityMappingBulkDelete",
+    "BulkOperationResult",
 ]

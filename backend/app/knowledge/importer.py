@@ -19,6 +19,7 @@ from app.knowledge.yaml_schemas import (
     FrameworkMappingYAML,
     FrameworkYAML,
     ModuleYAML,
+    ProductCapabilityMappingYAML,
     ProductYAML,
     VendorYAML,
 )
@@ -29,6 +30,7 @@ from app.models.framework import Framework
 from app.models.framework_mapping import FrameworkMapping
 from app.models.module import Module
 from app.models.product import Product
+from app.models.product_capability_mapping import ProductCapabilityMapping
 from app.models.vendor import Vendor
 from app.repositories.capability import CapabilityRepository
 from app.repositories.domain import DomainRepository
@@ -37,6 +39,7 @@ from app.repositories.framework import FrameworkRepository
 from app.repositories.framework_mapping import FrameworkMappingRepository
 from app.repositories.module import ModuleRepository
 from app.repositories.product import ProductRepository
+from app.repositories.product_capability_mapping import ProductCapabilityMappingRepository
 from app.repositories.vendor import VendorRepository
 
 Record = Tuple[str, Any]
@@ -67,6 +70,7 @@ class ImportResult:
     capabilities: ImportSummary = field(default_factory=ImportSummary)
     frameworks: ImportSummary = field(default_factory=ImportSummary)
     mappings: ImportSummary = field(default_factory=ImportSummary)
+    product_capability_mappings: ImportSummary = field(default_factory=ImportSummary)
 
     def as_dict(self) -> Dict[str, ImportSummary]:
         return {
@@ -79,6 +83,7 @@ class ImportResult:
             "capabilities": self.capabilities,
             "frameworks": self.frameworks,
             "mappings": self.mappings,
+            "product_capability_mappings": self.product_capability_mappings,
         }
 
 
@@ -102,6 +107,7 @@ class KnowledgeImporter:
         self.capability_repo = CapabilityRepository(session)
         self.framework_repo = FrameworkRepository(session)
         self.mapping_repo = FrameworkMappingRepository(session)
+        self.product_mapping_repo = ProductCapabilityMappingRepository(session)
 
     def import_all(self, base_path: Path, dry_run: bool = False) -> ImportResult:
         raw_vendors = load_yaml_directory(base_path / "vendors")
@@ -112,6 +118,7 @@ class KnowledgeImporter:
         raw_capabilities = load_yaml_directory(base_path / "capabilities")
         raw_frameworks = load_yaml_directory(base_path / "frameworks")
         raw_mappings = load_yaml_directory(base_path / "mappings")
+        raw_product_mappings = load_yaml_directory(base_path / "product_mappings")
 
         vendors = self._validate_batch(raw_vendors, VendorYAML)
         products = self._validate_batch(raw_products, ProductYAML)
@@ -121,6 +128,9 @@ class KnowledgeImporter:
         capabilities = self._validate_batch(raw_capabilities, CapabilityYAML)
         frameworks = self._validate_batch(raw_frameworks, FrameworkYAML)
         mappings = self._validate_batch(raw_mappings, FrameworkMappingYAML)
+        product_mappings = self._validate_batch(
+            raw_product_mappings, ProductCapabilityMappingYAML
+        )
 
         self._check_batch_duplicates(vendors, key=lambda v: v.name, entity="Vendor")
         self._check_batch_duplicates(
@@ -153,10 +163,23 @@ class KnowledgeImporter:
             ),
             entity="FrameworkMapping",
         )
+        self._check_batch_duplicates(
+            product_mappings,
+            key=lambda m: (
+                m.vendor,
+                m.product,
+                m.edition,
+                m.module,
+                m.capability_code,
+                m.licensing_tier,
+                m.deployment_model,
+            ),
+            entity="ProductCapabilityMapping",
+        )
 
         check_for_cycles(
             self._build_dependency_graph(
-                products, editions, modules, capabilities, mappings
+                products, editions, modules, capabilities, mappings, product_mappings
             )
         )
 
@@ -314,6 +337,41 @@ class KnowledgeImporter:
             obj, status_ = self._upsert(FrameworkMapping, existing, payload)
             result.mappings.record(status_)
 
+        for source, data in product_mappings:
+            module = module_by_key.get(
+                (data.vendor, data.product, data.edition, data.module)
+            ) or self._find_module(data.vendor, data.product, data.edition, data.module)
+            if module is None:
+                raise ReferenceNotFoundError(
+                    f"{source}: product mapping references unknown module "
+                    f"'{data.module}' (edition '{data.edition}', product "
+                    f"'{data.product}', vendor '{data.vendor}')"
+                )
+            capability = capability_by_code.get(
+                data.capability_code
+            ) or self.capability_repo.get_by_code(data.capability_code)
+            if capability is None:
+                raise ReferenceNotFoundError(
+                    f"{source}: product mapping references unknown capability "
+                    f"code '{data.capability_code}'"
+                )
+            existing = self.product_mapping_repo.get_by_natural_key(
+                module.id, capability.id, data.licensing_tier, data.deployment_model
+            )
+            payload = {
+                "vendor_id": module.edition.product.vendor_id,
+                "product_id": module.edition.product_id,
+                "edition_id": module.edition_id,
+                "module_id": module.id,
+                "capability_id": capability.id,
+                "licensing_tier": data.licensing_tier,
+                "supported_platforms": data.supported_platforms,
+                "deployment_model": data.deployment_model,
+                "availability_status": data.availability_status,
+            }
+            obj, status_ = self._upsert(ProductCapabilityMapping, existing, payload)
+            result.product_capability_mappings.record(status_)
+
         if dry_run:
             self.session.rollback()
         else:
@@ -346,6 +404,65 @@ class KnowledgeImporter:
             payload["domain_id"] = domain.id
             existing = self.capability_repo.get_by_code(data.code)
             _, status_ = self._upsert(Capability, existing, payload)
+            summary.record(status_)
+
+        self.session.commit()
+        return summary
+
+    def import_product_mappings_only(self, raw_records: List[dict]) -> ImportSummary:
+        """Validate and upsert a standalone batch of product-capability mappings.
+
+        Used by the product mapping catalog's YAML upload endpoint. Referenced
+        vendors/products/editions/modules/capabilities must already exist;
+        commits immediately since it is not part of a larger multi-entity
+        import.
+        """
+        records: List[Record] = [("upload", raw) for raw in raw_records]
+        product_mappings = self._validate_batch(records, ProductCapabilityMappingYAML)
+        self._check_batch_duplicates(
+            product_mappings,
+            key=lambda m: (
+                m.vendor,
+                m.product,
+                m.edition,
+                m.module,
+                m.capability_code,
+                m.licensing_tier,
+                m.deployment_model,
+            ),
+            entity="ProductCapabilityMapping",
+        )
+
+        summary = ImportSummary()
+        for source, data in product_mappings:
+            module = self._find_module(data.vendor, data.product, data.edition, data.module)
+            if module is None:
+                raise ReferenceNotFoundError(
+                    f"{source}: product mapping references unknown module "
+                    f"'{data.module}' (edition '{data.edition}', product "
+                    f"'{data.product}', vendor '{data.vendor}')"
+                )
+            capability = self.capability_repo.get_by_code(data.capability_code)
+            if capability is None:
+                raise ReferenceNotFoundError(
+                    f"{source}: product mapping references unknown capability "
+                    f"code '{data.capability_code}'"
+                )
+            existing = self.product_mapping_repo.get_by_natural_key(
+                module.id, capability.id, data.licensing_tier, data.deployment_model
+            )
+            payload = {
+                "vendor_id": module.edition.product.vendor_id,
+                "product_id": module.edition.product_id,
+                "edition_id": module.edition_id,
+                "module_id": module.id,
+                "capability_id": capability.id,
+                "licensing_tier": data.licensing_tier,
+                "supported_platforms": data.supported_platforms,
+                "deployment_model": data.deployment_model,
+                "availability_status": data.availability_status,
+            }
+            _, status_ = self._upsert(ProductCapabilityMapping, existing, payload)
             summary.record(status_)
 
         self.session.commit()
@@ -387,6 +504,7 @@ class KnowledgeImporter:
         modules: List[Tuple[str, ModuleYAML]],
         capabilities: List[Tuple[str, CapabilityYAML]],
         mappings: List[Tuple[str, FrameworkMappingYAML]],
+        product_mappings: List[Tuple[str, ProductCapabilityMappingYAML]],
     ) -> Dict[str, List[str]]:
         edges: Dict[str, List[str]] = {}
 
@@ -415,6 +533,17 @@ class KnowledgeImporter:
             )
             add_edge(mapping_key, f"capability:{mp.capability_code}")
             add_edge(mapping_key, f"framework:{mp.framework}/{mp.framework_version}")
+        for _, pm in product_mappings:
+            product_mapping_key = (
+                f"product_mapping:{pm.vendor}/{pm.product}/{pm.edition}/"
+                f"{pm.module}/{pm.capability_code}/{pm.licensing_tier}/"
+                f"{pm.deployment_model}"
+            )
+            add_edge(
+                product_mapping_key,
+                f"module:{pm.vendor}/{pm.product}/{pm.edition}/{pm.module}",
+            )
+            add_edge(product_mapping_key, f"capability:{pm.capability_code}")
 
         return edges
 
@@ -431,6 +560,14 @@ class KnowledgeImporter:
         if product is None:
             return None
         return self.edition_repo.get_by_product_and_name(product.id, edition_name)
+
+    def _find_module(
+        self, vendor_name: str, product_name: str, edition_name: str, module_name: str
+    ) -> Optional[Module]:
+        edition = self._find_edition(vendor_name, product_name, edition_name)
+        if edition is None:
+            return None
+        return self.module_repo.get_by_edition_and_name(edition.id, module_name)
 
     def _upsert(self, model_cls: type, existing: Any, payload: dict) -> Tuple[Any, str]:
         if existing is not None:
