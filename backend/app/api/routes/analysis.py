@@ -23,6 +23,12 @@ from app.engine.recommendation_export import (
     export_recommendation_json,
     export_recommendation_pdf,
 )
+from app.engine.simulation_engine import SimulationEngine
+from app.engine.simulation_export import (
+    export_simulation_excel,
+    export_simulation_json,
+    export_simulation_pdf,
+)
 from app.schemas.coverage import (
     CapabilityMatrix,
     CoverageReport,
@@ -36,6 +42,7 @@ from app.schemas.recommendation import (
     RecommendationRequest,
     RecommendationSummary,
 )
+from app.schemas.simulation import SimulationReport, SimulationRequest, SimulationSummary
 
 router = APIRouter(prefix="/analysis", tags=["analysis"])
 
@@ -312,3 +319,77 @@ def overlap_summary(assessment_id: int, session: SessionDep):
 )
 def get_overlap(assessment_id: int, session: SessionDep):
     return OverlapEngine(session).calculate(assessment_id)
+
+
+# ---------------------------------------------------------------- Simulation --
+# Static sibling paths (export/summary) must be registered before the dynamic
+# /simulation/{simulation_id} route below, same reasoning as /gaps above.
+
+
+@router.post(
+    "/simulation",
+    response_model=SimulationReport,
+    summary="Simulate a scenario against an assessment project's current architecture",
+)
+def run_simulation(payload: SimulationRequest, session: SessionDep):
+    return SimulationEngine(session).simulate(payload)
+
+
+@router.get(
+    "/simulation/export",
+    summary="Export a stored simulation report as JSON, Excel, or PDF",
+)
+def export_simulation(
+    session: SessionDep,
+    simulation_id: int,
+    format: str = Query("json", pattern="^(json|excel|pdf)$"),
+):
+    report = SimulationEngine(session).get(simulation_id)
+    if format == "excel":
+        content = export_simulation_excel(report)
+    elif format == "pdf":
+        content = export_simulation_pdf(report)
+    else:
+        content = export_simulation_json(report)
+
+    filename = f"simulation-{simulation_id}.{_EXPORT_EXTENSIONS[format]}"
+    return Response(
+        content=content,
+        media_type=_EXPORT_MEDIA_TYPES[format],
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+    )
+
+
+@router.get(
+    "/simulation/summary",
+    response_model=SimulationSummary,
+    summary="Executive summary of a stored simulation report",
+)
+def simulation_summary(simulation_id: int, session: SessionDep):
+    report = SimulationEngine(session).get(simulation_id)
+    return SimulationSummary(
+        **report.model_dump(
+            exclude={
+                "current_coverage",
+                "proposed_coverage",
+                "current_gap",
+                "proposed_gap",
+                "current_recommendation",
+                "proposed_recommendation",
+                "current_overlap",
+                "proposed_overlap",
+                "capability_comparison",
+                "vendor_comparison",
+                "framework_comparison",
+            }
+        )
+    )
+
+
+@router.get(
+    "/simulation/{simulation_id}",
+    response_model=SimulationReport,
+    summary="Get a previously computed simulation report by id",
+)
+def get_simulation(simulation_id: int, session: SessionDep):
+    return SimulationEngine(session).get(simulation_id)

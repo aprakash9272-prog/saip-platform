@@ -27,6 +27,7 @@ from app.models.product_capability_mapping import (
     ProductCapabilityMapping,
     ProductCapabilityMappingBase,
 )
+from app.models.simulation_run import SimulationRun, SimulationRunBase
 from app.models.vendor import Vendor, VendorBase
 
 __all__ = [
@@ -66,4 +67,6 @@ __all__ = [
     "ProductAssignmentBase",
     "ProductAssignmentModuleLink",
     "DeploymentStatus",
+    "SimulationRun",
+    "SimulationRunBase",
 ]

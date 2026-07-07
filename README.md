@@ -6,7 +6,7 @@ See [docs/PROJECT_BLUEPRINT.md](docs/PROJECT_BLUEPRINT.md) for the full product 
 
 ## Project Status
 
-**Sprint 10 — Security Overlap & Optimization Engine.** `OverlapEngine` closes out the analysis suite by identifying redundancy and consolidation opportunities across an assessment's deployed products — **deterministic rules only, no AI reasoning**. It detects duplicate capabilities (and specifically which are solved by *multiple different vendors*), product/module/framework-control overlap, redundant licenses, and capabilities that were purchased (an edition's module) but never enabled. From these it calculates an overlap %, an optimization score (blending redundancy with the Gap Engine's own gap %), a vendor consolidation score, a license reduction opportunity, a cost optimization score, and an operational complexity score. It also cross-references the Recommendation Engine's product comparison so an overlapping vendor that also helps close open gaps reads as a "keep" candidate rather than a pure duplicate. Reports are exportable as JSON, Excel, or PDF, and a dedicated Overlap page (executive summary, vendor comparison, an overlap matrix, a capability heatmap, duplicate products, and optimization opportunities, with a filterable/sortable/searchable duplicate-capability table) is linked from every Assessment Project. Builds on Sprint 9's Recommendation Engine, Sprint 8's Gap Analysis Engine, Sprint 7's Coverage Analysis Engine, and Sprint 5's `ProductCapabilityMapping` fact table. The Simulation Engine and AI Assistant are still not implemented.
+**Sprint 11 — Scenario Simulation Engine.** `SimulationEngine` closes out the alpha series by letting an architect ask "what if?" about an assessment's deployed architecture — add/remove/replace a product, swap an edition (upgrade/downgrade/change licensing tier), toggle a module, change a deployment model or availability status, or consolidate vendors/remove duplicate products — and see the exact before/after impact on Coverage, Gap, Recommendation, and Overlap, **without ever writing to the real assessment**. It reuses all four existing engines completely unmodified for both the "current" and "proposed" calculation passes (no scoring logic is duplicated); the hypothetical mutation is staged with `session.flush()` (never `commit()`) so the engines see it mid-transaction, then unconditionally rolled back before the request returns — verified against both SQLite and real PostgreSQL that this can never leak into the durable database. The only thing durably persisted is the computed report itself (a `SimulationRun` row), so a past "what-if" can be retrieved later by id. Produces ten current-vs-proposed metric deltas (coverage, gap, overlap, recommendation, risk, cost, complexity, vendor count, license count, framework coverage), each classified Improvement/Regression/Neutral, plus capability/vendor/framework comparison tables and a deterministic, templated executive summary — no AI, no LLM anywhere. Reports are exportable as JSON, Excel, or PDF, and a dedicated Simulation page (Scenario Builder wizard, current-vs-proposed metric cards, before/after charts, coverage heatmaps, vendor/framework/capability comparison tables) is linked from every Assessment Project. Builds on Sprint 10's Overlap Engine, Sprint 9's Recommendation Engine, Sprint 8's Gap Analysis Engine, and Sprint 7's Coverage Analysis Engine. The AI Assistant remains unimplemented — this closes out the deterministic analysis suite (Sprints 7-11).
 
 ## Monorepo Structure
 
@@ -19,8 +19,8 @@ backend/    FastAPI + SQLModel + Alembic service, PostgreSQL-backed
   app/api/routes/   FastAPI routers (thin controllers)
   app/knowledge/    YAML knowledge base + importer/exporter (see below)
   app/engine/       Analysis engines — coverage_engine.py, gap_engine.py, recommendation_engine.py,
-                    and overlap_engine.py implemented (Sprints 7-10); simulation/cost engines
-                    still placeholders
+                    overlap_engine.py, and simulation_engine.py implemented (Sprints 7-11);
+                    cost_engine.py still a placeholder
   tests/            pytest suite (importer, validation, API, engine unit/perf tests)
 frontend/   Next.js 15 + TypeScript + Tailwind CSS + shadcn/ui dashboard
   src/app/(dashboard)/knowledge-base/    Knowledge Base pages (vendors, products, ...)
@@ -30,12 +30,15 @@ frontend/   Next.js 15 + TypeScript + Tailwind CSS + shadcn/ui dashboard
   src/app/(dashboard)/assessments/[id]/gaps/            Dedicated Gap Analysis page
   src/app/(dashboard)/assessments/[id]/recommendations/ Dedicated Recommendations page
   src/app/(dashboard)/assessments/[id]/overlap/         Dedicated Overlap & Optimization page
+  src/app/(dashboard)/assessments/[id]/simulation/      Dedicated Scenario Simulation page
   src/components/knowledge-base/         Config-driven CRUD table/form/detail components
   src/components/customers/              Customer detail + business unit/environment/assessment dialogs
   src/components/assessments/            Assessment project page, product assignment wizard, coverage
                                           analysis section, the Gap Analysis page, the Recommendations
-                                          page, and the Overlap page (vendor comparison, overlap
-                                          matrix, capability heatmap, duplicate products)
+                                          page, the Overlap page (vendor comparison, overlap
+                                          matrix, capability heatmap, duplicate products), and the
+                                          Simulation page (scenario builder, current-vs-proposed
+                                          metrics, before/after charts, comparison tables)
 docs/       Product blueprint and architecture documentation
 ```
 
@@ -211,6 +214,20 @@ An `OverlapReport` exports as **JSON**, **Excel** (Summary / Vendor Comparison /
 
 A dedicated **Overlap** page (`/assessments/{id}/overlap`, linked from the Assessment Project page) shows an executive summary of every score above, duplicate-capabilities-by-domain and unique-vs-overlapping-by-vendor charts, a domain capability heatmap, a vendor comparison table, a product-by-product overlap matrix, a duplicate-products (license reduction) table, an unused-capabilities table, and a searchable/filterable/sortable duplicate-capability table.
 
+## Scenario Simulation Engine
+
+`SimulationEngine` (`backend/app/engine/simulation_engine.py`) lets an architect simulate a hypothetical architecture change and see its exact impact **without ever modifying the real assessment**. It reuses `CoverageEngine`, `GapEngine`, `RecommendationEngine`, and `OverlapEngine` completely unmodified for both the "current" (before) and "proposed" (after) calculation passes — no scoring logic is duplicated anywhere in this engine. **Deterministic only: no AI, no LLM, no generated text anywhere.**
+
+Twelve scenario types are supported, all mechanically reducing to a small set of primitive mutations on `ProductAssignment` rows: **Add Product**, **Remove Product**, **Replace Product** (remove + add), **Upgrade Edition** / **Downgrade Edition** / **Change Licensing Tier** (all an edition swap — the caller/UI decides which target edition represents an upgrade vs. downgrade vs. tier change), **Enable Module** / **Disable Module**, **Change Deployment Model**, **Change Availability Status** (maps onto `ProductAssignment.deployment_status`, the only availability-style field an assessment actually has), and **Consolidate Vendors** / **Remove Duplicate Products** (both a bulk removal of caller-specified assignment ids, typically sourced from the Overlap Engine's own output).
+
+**Safety model.** The hypothetical mutation is written with `session.add()` / `session.flush()` — never `session.commit()` — so the four engines (querying through the same session) see it, but nothing is durably written. A `finally` block unconditionally calls `session.rollback()` before the request returns, discarding the flushed-but-uncommitted change whether or not an error occurred mid-scenario. This was verified empirically against both SQLite and a real PostgreSQL instance: a plain `session.commit()` (what the existing `ProductAssignmentService.create/update/delete` call internally) durably persists even inside a SAVEPOINT, whereas `flush()` + `rollback()` never does — which is why this engine reuses only the side-effect-free validation helpers from `ProductAssignmentService` (`validate_references`, `validate_duplicate`, `_resolve_modules`) rather than its committing CRUD methods.
+
+For every scenario, the engine produces ten current-vs-proposed **metric deltas** — Coverage, Gap, Overlap, Recommendation (estimated remaining risk reduction potential), Risk (the Gap Engine's own risk score), Cost (Overlap Engine's cost optimization score), Complexity, Vendor Count, License Count, and Framework Coverage — each classified **Improvement / Regression / Neutral**, plus **capability**, **vendor**, and **framework comparison** tables (only entries that actually changed) and a deterministic, templated **executive summary**. Only the final computed report is durably persisted (as a `SimulationRun` row), purely so a past simulation can be retrieved later by id — the assessment mutation itself is never stored anywhere.
+
+A `SimulationReport` exports as **JSON**, **Excel** (Summary / Deltas / Executive Summary / Capability / Vendor / Framework Comparison sheets), or **PDF** via `GET /analysis/simulation/export?simulation_id=&format=`.
+
+A dedicated **Simulation** page (`/assessments/{id}/simulation`, linked from the Assessment Project page) provides a **Scenario Builder** (scenario type selector with the fields each scenario needs — cascading vendor/product/edition/module selects, existing-assignment pickers, target-edition/module pickers, bulk-assignment checkboxes), then renders the results: an executive summary, current-vs-proposed metric cards with Improvement/Regression badges, a before/after bar chart of the score-scale metrics, side-by-side current/proposed coverage heatmaps, and vendor/framework/capability comparison tables — plus JSON/Excel/PDF export buttons.
+
 ## Backend APIs
 
 Full CRUD + search + pagination is available for every knowledge base entity, documented in Swagger at `/docs`:
@@ -305,6 +322,18 @@ GET  /analysis/overlap/export?assessment_id=     ?format=json|excel|pdf -> file 
 GET  /analysis/overlap/summary?assessment_id=    executive summary only (no vendor/matrix/product/license/unused lists)
 ```
 
+The Scenario Simulation Engine adds:
+
+```
+POST /analysis/simulation                          body: SimulationRequest (assessment_project_id,
+                                                     scenario_type, and the fields that scenario needs)
+                                                     -> SimulationReport (also persisted for later retrieval)
+GET  /analysis/simulation/{simulation_id}           a previously computed SimulationReport, by id
+GET  /analysis/simulation/export?simulation_id=     ?format=json|excel|pdf -> file download
+GET  /analysis/simulation/summary?simulation_id=    executive summary only (no current/proposed report
+                                                     bodies or comparison lists)
+```
+
 ## Local Development
 
 ### Backend
@@ -350,6 +379,8 @@ The **Gap Analysis** button on the Assessment Project page opens `/assessments/{
 The **Recommendations** button opens `/assessments/{id}/recommendations`: an executive summary (estimated risk reduction, priority counts), a coverage improvement forecast bar, a Top Recommendations card grid, a priority-matrix bar chart, a product comparison table, and a recommendation table with search, priority/domain filters, sortable columns, and JSON/Excel/PDF export.
 
 The **Overlap** button opens `/assessments/{id}/overlap`: an executive summary of every optimization score, duplicate-capabilities-by-domain and unique-vs-overlapping-by-vendor charts, a domain capability heatmap, a vendor comparison table, a product-by-product overlap matrix, a duplicate-products (license reduction) table, an unused-capabilities table, and a duplicate-capability table with search, domain/cross-vendor filters, sortable columns, and JSON/Excel/PDF export.
+
+The **Simulation** button opens `/assessments/{id}/simulation`: a Scenario Builder (pick one of the 12 scenario types, then fill in only the fields it needs), and once run, an executive summary, current-vs-proposed metric cards (coverage/gap/overlap/recommendation/risk/cost/complexity/vendor count/license count/framework coverage, each badged Improvement/Regression/Neutral), a before/after bar chart, side-by-side current/proposed coverage heatmaps, and vendor/framework/capability comparison tables, with JSON/Excel/PDF export.
 
 ## Makefile Reference
 

@@ -2,6 +2,19 @@
 
 All notable changes to this project are documented in this file.
 
+## [v1.0.0-alpha] — 2026-07-07 — Scenario Simulation Engine
+
+### Added
+- `SimulationEngine` (`app/engine/simulation_engine.py`), the final engine of the alpha analysis suite: simulates a hypothetical architecture change against an assessment project's real Deployed product assignments **without ever modifying them**. Reuses `CoverageEngine`, `GapEngine`, `RecommendationEngine`, and `OverlapEngine` completely unmodified for both a "current" and "proposed" calculation pass — no scoring logic is duplicated. Fully deterministic — no AI, no LLM, no generated text.
+- 12 supported scenario types, all reducing to a handful of primitive mutations on `ProductAssignment`: Add Product, Remove Product, Replace Product, Upgrade Edition, Downgrade Edition, Enable Module, Disable Module, Change Licensing Tier, Change Deployment Model, Change Availability Status, Consolidate Vendors, Remove Duplicate Products.
+- Safety model verified empirically against both SQLite and real PostgreSQL: the hypothetical mutation is staged with `session.add()` / `session.flush()` (never `session.commit()`), and a `finally` block unconditionally calls `session.rollback()` before the request returns — discarding the flushed-but-uncommitted change whether or not the scenario succeeds. Reuses only `ProductAssignmentService`'s non-committing validation helpers (`validate_references`, `validate_duplicate`, `_resolve_modules`); every mutation is applied directly via `session.add`/`session.delete`/`session.flush`, never the service's committing `create`/`update`/`delete`.
+- Ten current-vs-proposed metric deltas — Coverage, Gap, Overlap, Recommendation (estimated remaining risk reduction potential), Risk, Cost, Complexity, Vendor Count, License Count, Framework Coverage — each classified Improvement/Regression/Neutral by a single shared, unit-tested classification function.
+- Capability, vendor, and framework comparison tables (only entries whose status actually changed) and a deterministic, templated executive summary built purely from already-computed numbers.
+- A new `SimulationRun` table/model persists only the final computed `SimulationReport` (not the assessment mutation) so a past simulation can be retrieved later by id — the audit-trail record itself contains no trace of the hypothetical change.
+- `POST /analysis/simulation`, `GET /analysis/simulation/{id}`, `GET /analysis/simulation/export` (JSON/Excel/PDF), `GET /analysis/simulation/summary`, documented in Swagger.
+- A dedicated Simulation page (`/assessments/{id}/simulation`, linked from the Assessment Project page): a Scenario Builder wizard (scenario-specific cascading vendor/product/edition/module selects, existing-assignment and target-edition/module pickers, bulk-assignment checkboxes), current-vs-proposed metric cards with classification badges, a before/after bar chart, side-by-side current/proposed coverage heatmaps, and vendor/framework/capability comparison tables, plus JSON/Excel/PDF export.
+- Unit tests covering all key scenario types, persistence/retrieval by id, and the rollback-on-error safety guarantee; API integration tests for all four endpoints and every export format (plus a route-ordering regression guard); and a performance test reusing the Sprint 8 bulk-catalog fixture (215 backend tests total, all passing).
+
 ## [v0.9.0-alpha] — 2026-07-07 — Security Overlap & Optimization Engine
 
 ### Added

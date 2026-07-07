@@ -5,6 +5,7 @@ import {
   Blocks,
   Building2,
   Download,
+  FlaskConical,
   Layers,
   Layers3,
   Lightbulb,
@@ -304,6 +305,11 @@ export function AssessmentProjectPage({ projectId }: AssessmentProjectPageProps)
           <Button asChild variant="outline">
             <Link href={`/assessments/${projectId}/overlap`}>
               <Layers3 className="size-4" /> Overlap
+            </Link>
+          </Button>
+          <Button asChild variant="outline">
+            <Link href={`/assessments/${projectId}/simulation`}>
+              <FlaskConical className="size-4" /> Simulation
             </Link>
           </Button>
           <Button variant="outline" onClick={() => setProjectFormOpen(true)}>

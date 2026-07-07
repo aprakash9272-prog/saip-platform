@@ -48,6 +48,10 @@ import type {
   RecommendationExportFormat,
   RecommendationReport,
   RecommendationSummary,
+  SimulationExportFormat,
+  SimulationReport,
+  SimulationRequest,
+  SimulationSummary,
   Vendor,
   VendorInput,
 } from "@/lib/api/types";
@@ -427,5 +431,32 @@ export function downloadOverlapExport(
   return apiClient.getBlob(
     `/analysis/overlap/export${qs}`,
     `overlap-${assessmentProjectId}.${format === "excel" ? "xlsx" : format}`,
+  );
+}
+
+// ------------------------------------------------- Scenario Simulation --
+
+export function runSimulation(payload: SimulationRequest): Promise<SimulationReport> {
+  return apiClient.post<SimulationReport>("/analysis/simulation", payload);
+}
+
+export function getSimulationReport(simulationId: number): Promise<SimulationReport> {
+  return apiClient.get<SimulationReport>(`/analysis/simulation/${simulationId}`);
+}
+
+export function getSimulationSummary(simulationId: number): Promise<SimulationSummary> {
+  return apiClient.get<SimulationSummary>(
+    `/analysis/simulation/summary${buildQuery({ simulation_id: simulationId })}`,
+  );
+}
+
+export function downloadSimulationExport(
+  simulationId: number,
+  format: SimulationExportFormat,
+): Promise<BlobDownload> {
+  const qs = buildQuery({ simulation_id: simulationId, format });
+  return apiClient.getBlob(
+    `/analysis/simulation/export${qs}`,
+    `simulation-${simulationId}.${format === "excel" ? "xlsx" : format}`,
   );
 }

@@ -84,6 +84,17 @@ from app.schemas.recommendation import (
     RecommendationRequest,
     RecommendationSummary,
 )
+from app.schemas.simulation import (
+    CapabilityComparisonItem,
+    ComparisonClassification,
+    FrameworkComparisonItem,
+    MetricComparison,
+    ScenarioType,
+    SimulationReport,
+    SimulationRequest,
+    SimulationSummary,
+    VendorComparisonItem,
+)
 from app.schemas.vendor import VendorCreate, VendorRead, VendorUpdate
 
 __all__ = [
@@ -168,4 +179,13 @@ __all__ = [
     "DomainOverlapScore",
     "OverlapSummary",
     "OverlapReport",
+    "ScenarioType",
+    "ComparisonClassification",
+    "SimulationRequest",
+    "MetricComparison",
+    "CapabilityComparisonItem",
+    "VendorComparisonItem",
+    "FrameworkComparisonItem",
+    "SimulationSummary",
+    "SimulationReport",
 ]

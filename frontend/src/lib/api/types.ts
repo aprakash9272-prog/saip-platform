@@ -693,3 +693,135 @@ export interface OverlapReport extends OverlapSummary {
 }
 
 export type OverlapExportFormat = "json" | "excel" | "pdf";
+
+// ------------------------------------------------- Scenario Simulation --
+
+export const SCENARIO_TYPES = [
+  "add_product",
+  "remove_product",
+  "replace_product",
+  "upgrade_edition",
+  "downgrade_edition",
+  "enable_module",
+  "disable_module",
+  "change_licensing_tier",
+  "change_deployment_model",
+  "change_availability_status",
+  "consolidate_vendors",
+  "remove_duplicate_products",
+] as const;
+export type ScenarioType = (typeof SCENARIO_TYPES)[number];
+
+export const SCENARIO_TYPE_LABELS: Record<ScenarioType, string> = {
+  add_product: "Add Product",
+  remove_product: "Remove Product",
+  replace_product: "Replace Product",
+  upgrade_edition: "Upgrade Edition",
+  downgrade_edition: "Downgrade Edition",
+  enable_module: "Enable Module",
+  disable_module: "Disable Module",
+  change_licensing_tier: "Change Licensing Tier",
+  change_deployment_model: "Change Deployment Model",
+  change_availability_status: "Change Availability Status",
+  consolidate_vendors: "Consolidate Vendors",
+  remove_duplicate_products: "Remove Duplicate Products",
+};
+
+export type ComparisonClassification = "Improvement" | "Regression" | "Neutral";
+
+export interface SimulationRequest {
+  assessment_project_id: number;
+  scenario_type: ScenarioType;
+  name?: string | null;
+  vendor_id?: number | null;
+  product_id?: number | null;
+  edition_id?: number | null;
+  environment_id?: number | null;
+  module_ids?: number[] | null;
+  license_quantity?: number | null;
+  deployment_model?: string | null;
+  deployment_status?: string | null;
+  notes?: string | null;
+  assignment_id?: number | null;
+  target_edition_id?: number | null;
+  target_module_ids?: number[] | null;
+  module_id?: number | null;
+  assignment_ids?: number[] | null;
+}
+
+export interface MetricComparison {
+  metric: string;
+  current_value: number;
+  proposed_value: number;
+  delta: number;
+  percentage_change: number;
+  classification: ComparisonClassification;
+}
+
+export interface CapabilityComparisonItem {
+  id: number;
+  code: string;
+  name: string;
+  domain_name: string;
+  current_covered: boolean;
+  proposed_covered: boolean;
+  current_provider_count: number;
+  proposed_provider_count: number;
+  classification: ComparisonClassification;
+}
+
+export interface VendorComparisonItem {
+  vendor: string;
+  current_deployed: boolean;
+  proposed_deployed: boolean;
+  current_capability_count: number;
+  proposed_capability_count: number;
+  current_license_quantity: number;
+  proposed_license_quantity: number;
+  classification: ComparisonClassification;
+}
+
+export interface FrameworkComparisonItem {
+  framework_name: string;
+  framework_version: string;
+  total_controls: number;
+  current_satisfied_controls: number;
+  proposed_satisfied_controls: number;
+  classification: ComparisonClassification;
+}
+
+export interface SimulationSummary {
+  id: number;
+  assessment_project_id: number;
+  assessment_project_name: string;
+  scenario_type: ScenarioType;
+  name: string | null;
+  generated_at: string;
+  coverage_delta: MetricComparison;
+  gap_delta: MetricComparison;
+  overlap_delta: MetricComparison;
+  recommendation_delta: MetricComparison;
+  risk_delta: MetricComparison;
+  cost_delta: MetricComparison;
+  complexity_delta: MetricComparison;
+  vendor_count_delta: MetricComparison;
+  license_count_delta: MetricComparison;
+  framework_coverage_delta: MetricComparison;
+  executive_summary: string[];
+}
+
+export interface SimulationReport extends SimulationSummary {
+  current_coverage: CoverageReport;
+  proposed_coverage: CoverageReport;
+  current_gap: GapReport;
+  proposed_gap: GapReport;
+  current_recommendation: RecommendationReport;
+  proposed_recommendation: RecommendationReport;
+  current_overlap: OverlapReport;
+  proposed_overlap: OverlapReport;
+  capability_comparison: CapabilityComparisonItem[];
+  vendor_comparison: VendorComparisonItem[];
+  framework_comparison: FrameworkComparisonItem[];
+}
+
+export type SimulationExportFormat = "json" | "excel" | "pdf";
