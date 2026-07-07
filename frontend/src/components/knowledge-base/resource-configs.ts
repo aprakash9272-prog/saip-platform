@@ -2,6 +2,7 @@ import { z } from "zod";
 
 import {
   capabilitiesApi,
+  customersApi,
   domainsApi,
   editionsApi,
   frameworksApi,
@@ -14,6 +15,8 @@ import {
 import type {
   Capability,
   CapabilityInput,
+  Customer,
+  CustomerInput,
   Domain,
   DomainInput,
   Edition,
@@ -568,6 +571,47 @@ const productMappingConfig: ResourceConfig<
   }),
 };
 
+// -------------------------------------------------------------- Customers --
+
+export const customerCreateSchema = z.object({
+  name: z.string().min(1, "Name is required"),
+  industry: optionalText,
+  website: optionalText,
+  headquarters: optionalText,
+  description: optionalText,
+});
+export const customerUpdateSchema = customerCreateSchema.partial();
+
+const customerConfig: ResourceConfig<Customer, CustomerInput, Partial<CustomerInput>> = {
+  key: "customers",
+  title: "Customers",
+  description: "Organizations onboarded to the platform for security assessment.",
+  labelField: "name",
+  api: customersApi,
+  searchPlaceholder: "Search customers by name, industry, or headquarters...",
+  createSchema: customerCreateSchema,
+  updateSchema: customerUpdateSchema,
+  columns: [
+    { key: "name", header: "Name" },
+    { key: "industry", header: "Industry" },
+    { key: "headquarters", header: "Headquarters" },
+  ],
+  fields: [
+    { name: "name", label: "Name", type: "text", required: true },
+    { name: "industry", label: "Industry", type: "text" },
+    { name: "website", label: "Website", type: "text", placeholder: "https://..." },
+    { name: "headquarters", label: "Headquarters", type: "text" },
+    { name: "description", label: "Description", type: "textarea" },
+  ],
+  toFormValues: (item) => ({
+    name: item.name,
+    industry: item.industry ?? "",
+    website: item.website ?? "",
+    headquarters: item.headquarters ?? "",
+    description: item.description ?? "",
+  }),
+};
+
 export const RESOURCE_REGISTRY: Record<ResourceKey, ResourceConfig> = {
   vendors: vendorConfig,
   products: productConfig,
@@ -578,4 +622,5 @@ export const RESOURCE_REGISTRY: Record<ResourceKey, ResourceConfig> = {
   frameworks: frameworkConfig,
   mappings: mappingConfig,
   "product-mappings": productMappingConfig,
+  customers: customerConfig,
 };

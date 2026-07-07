@@ -9,7 +9,7 @@ SessionDep = Annotated[Session, Depends(get_session)]
 
 
 class PaginationParams:
-    """Shared list-endpoint query params: pagination + free-text search."""
+    """Shared list-endpoint query params: pagination + free-text search + sorting."""
 
     def __init__(
         self,
@@ -18,7 +18,13 @@ class PaginationParams:
         search: Optional[str] = Query(
             None, min_length=1, max_length=200, description="Free-text search."
         ),
+        sort_by: Optional[str] = Query(
+            None, description="Column name to sort by (defaults to id)."
+        ),
+        sort_desc: bool = Query(False, description="Sort descending instead of ascending."),
     ):
         self.skip = skip
         self.limit = limit
         self.search = search
+        self.sort_by = sort_by
+        self.sort_desc = sort_desc

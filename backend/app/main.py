@@ -5,13 +5,18 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from app.api.routes import (
+    assessment_projects,
+    business_units,
     capabilities,
+    customers,
     domains,
     editions,
+    environments,
     frameworks,
     health,
     mappings,
     modules,
+    product_assignments,
     product_mappings,
     products,
     vendors,
@@ -74,6 +79,11 @@ app.include_router(capabilities.router)
 app.include_router(frameworks.router)
 app.include_router(mappings.router)
 app.include_router(product_mappings.router)
+app.include_router(customers.router)
+app.include_router(business_units.router)
+app.include_router(environments.router)
+app.include_router(assessment_projects.router)
+app.include_router(product_assignments.router)
 
 
 @app.on_event("startup")

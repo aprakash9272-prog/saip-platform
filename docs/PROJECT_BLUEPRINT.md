@@ -242,3 +242,15 @@ Potential future capabilities include:
 - Advanced graph analytics
 - Autonomous remediation recommendations
 - Integration with broader security operations ecosystems
+
+## 25. Implementation Status
+
+Sprint-by-sprint delivery against this blueprint:
+
+- **Sprint 2 — Project Foundation.** Docker Compose stack (FastAPI/SQLModel/Alembic + PostgreSQL, Next.js frontend), clean architecture layering, CI scaffolding.
+- **Sprint 3 — Security Knowledge Base.** Vendor, Product, Edition, Module, Framework, FrameworkMapping entities; YAML knowledge base + idempotent importer/exporter.
+- **Sprint 4 — Security Capability Catalog.** Domain taxonomy (18 domains) and vendor-neutral Capability catalog (324 capabilities), with YAML import/export and filter/facet APIs.
+- **Sprint 5 — Product Capability Mapping.** `ProductCapabilityMapping` fact table linking vendor → product → edition → module → capability (licensing tier, supported platforms, deployment model, availability status), populated for 7 named vendors, with bulk-edit UI.
+- **Sprint 6 — Customer Assessment Workspace.** Customer → Business Unit / Environment / Assessment Project → Product Assignment data model, referencing (never duplicating) the Sprint 5 knowledge base; an informational assessment dashboard; JSON export/import of assessments.
+
+Coverage, Gap, Overlap, Recommendation, Simulation, and AI Assistant engines (Sections 9–13) are intentionally not yet implemented — Sprints 3–6 exist to build the knowledge base and customer workspace those engines will consume.

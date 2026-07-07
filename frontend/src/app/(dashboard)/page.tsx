@@ -9,8 +9,8 @@ import {
 
 const SUMMARY_CARDS = [
   {
-    title: "Organizations",
-    description: "Onboarded organizations",
+    title: "Customers",
+    description: "Onboarded customers",
     icon: Building2,
   },
   {

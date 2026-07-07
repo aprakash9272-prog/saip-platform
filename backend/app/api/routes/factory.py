@@ -43,7 +43,11 @@ def build_crud_router(
     def list_items(session: SessionDep, pagination: PaginationParams = Depends()):
         service = service_factory(session)
         items, total = service.list(
-            skip=pagination.skip, limit=pagination.limit, search=pagination.search
+            skip=pagination.skip,
+            limit=pagination.limit,
+            search=pagination.search,
+            sort_by=pagination.sort_by,
+            sort_desc=pagination.sort_desc,
         )
         return PaginatedResponse[read_schema](
             items=list(items),

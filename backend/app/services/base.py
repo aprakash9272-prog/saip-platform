@@ -23,8 +23,17 @@ class BaseService(Generic[ModelType]):
         limit: int = 50,
         search: Optional[str] = None,
         filters: Optional[dict] = None,
+        sort_by: Optional[str] = None,
+        sort_desc: bool = False,
     ) -> tuple[Sequence[ModelType], int]:
-        return self.repository.list(skip=skip, limit=limit, search=search, filters=filters)
+        return self.repository.list(
+            skip=skip,
+            limit=limit,
+            search=search,
+            filters=filters,
+            sort_by=sort_by,
+            sort_desc=sort_desc,
+        )
 
     def get(self, id_: int) -> ModelType:
         obj = self.repository.get(id_)

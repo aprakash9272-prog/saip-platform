@@ -25,7 +25,11 @@ def _to_read(module: Module) -> ModuleRead:
 def list_modules(session: SessionDep, pagination: PaginationParams = Depends()):
     service = ModuleService(session)
     items, total = service.list(
-        skip=pagination.skip, limit=pagination.limit, search=pagination.search
+        skip=pagination.skip,
+        limit=pagination.limit,
+        search=pagination.search,
+        sort_by=pagination.sort_by,
+        sort_desc=pagination.sort_desc,
     )
     return PaginatedResponse[ModuleRead](
         items=[_to_read(m) for m in items],

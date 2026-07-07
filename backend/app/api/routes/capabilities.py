@@ -36,6 +36,8 @@ def list_capabilities(
         limit=pagination.limit,
         search=pagination.search,
         filters={"domain_id": domain_id, "risk_category": risk_category},
+        sort_by=pagination.sort_by,
+        sort_desc=pagination.sort_desc,
     )
     return PaginatedResponse[CapabilityRead](
         items=list(items), total=total, skip=pagination.skip, limit=pagination.limit

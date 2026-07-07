@@ -61,6 +61,8 @@ def list_product_mappings(
             "availability_status": availability_status,
             "licensing_tier": licensing_tier,
         },
+        sort_by=pagination.sort_by,
+        sort_desc=pagination.sort_desc,
     )
     return PaginatedResponse[ProductCapabilityMappingRead](
         items=list(items), total=total, skip=pagination.skip, limit=pagination.limit

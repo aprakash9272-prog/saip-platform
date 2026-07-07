@@ -11,7 +11,8 @@ export type ResourceKey =
   | "capabilities"
   | "frameworks"
   | "mappings"
-  | "product-mappings";
+  | "product-mappings"
+  | "customers";
 
 export interface ReferenceConfig {
   resourceKey: ResourceKey;

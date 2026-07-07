@@ -6,7 +6,7 @@ See [docs/PROJECT_BLUEPRINT.md](docs/PROJECT_BLUEPRINT.md) for the full product 
 
 ## Project Status
 
-**Sprint 5 — Product Capability Mapping.** The knowledge base now has its core mapping layer: a `ProductCapabilityMapping` fact table linking vendor → product → edition → module → capability, with licensing tier, supported platforms, deployment model, and availability status. Populated with 16 real mappings across 7 named vendors (CrowdStrike, Microsoft, SentinelOne, Trellix, Palo Alto Networks, Okta, Splunk). Builds on Sprint 4's domain taxonomy (18 domains, 324 capabilities) and the Sprint 3 foundation (vendors, products, editions, modules, frameworks, framework mappings). No analysis logic (coverage, gap, overlap, recommendation, simulation, AI) has been implemented yet — these sprints only build the knowledge foundation those future engines will read from.
+**Sprint 6 — Customer Assessment Workspace.** The platform now has a customer/project layer that represents a real organization's security environment: `Customer` → `Business Unit` / `Environment` / `Assessment Project`, and `Assessment Project` → `Product Assignment` (referencing existing Sprint 5 Vendor/Product/Edition/Module records — never duplicating catalog data). Each assignment tracks modules enabled, license quantity, deployment model, deployment status, environment, and notes. An informational dashboard rolls up deployed products, vendors, modules, capabilities, domains, and frameworks represented in an assessment — no coverage/gap/overlap scoring yet. Assessments support JSON export/import keyed by natural names (idempotent re-import). Builds on Sprint 5's `ProductCapabilityMapping` fact table (7 named vendors), Sprint 4's domain taxonomy (18 domains, 324 capabilities), and the Sprint 3 foundation (vendors, products, editions, modules, frameworks, framework mappings). No analysis logic (coverage, gap, overlap, recommendation, simulation, AI) has been implemented yet — these sprints only build the workspace and knowledge foundation those future engines will read from.
 
 ## Monorepo Structure
 
@@ -21,8 +21,12 @@ backend/    FastAPI + SQLModel + Alembic service, PostgreSQL-backed
   app/engine/       Future analysis engines (coverage/gap/overlap/...) — not implemented yet
   tests/            pytest suite (importer, validation, API)
 frontend/   Next.js 15 + TypeScript + Tailwind CSS + shadcn/ui dashboard
-  src/app/(dashboard)/knowledge-base/   Knowledge Base pages (vendors, products, ...)
-  src/components/knowledge-base/        Config-driven CRUD table/form/detail components
+  src/app/(dashboard)/knowledge-base/    Knowledge Base pages (vendors, products, ...)
+  src/app/(dashboard)/customers/         Customer list + detail (business units, environments, assessments)
+  src/app/(dashboard)/assessments/[id]/  Assessment project page (dashboard, product assignments, import/export)
+  src/components/knowledge-base/         Config-driven CRUD table/form/detail components
+  src/components/customers/              Customer detail + business unit/environment/assessment dialogs
+  src/components/assessments/            Assessment project page + product assignment wizard
 docs/       Product blueprint and architecture documentation
 ```
 
@@ -95,6 +99,26 @@ The importer:
 
 `export_all` deliberately writes to `backend/exports/knowledge/` rather than back into `app/knowledge/`, so re-running `import_all` against the source tree never sees duplicate records.
 
+## Customer Assessment Workspace
+
+The customer/project layer represents a real organization's security environment — the input that future Coverage, Gap, Overlap, Recommendation, Simulation, and AI engines will read from.
+
+```
+Customer
+ ├── Business Units       divisions/departments within the customer
+ ├── Environments         Production, UAT, Development, DR, OT
+ └── Assessment Projects  a security assessment engagement
+      └── Product Assignments   an existing Vendor/Product/Edition (+ Modules) deployed
+                                into one Environment, with license quantity, deployment
+                                model, deployment status, and notes
+```
+
+Product Assignments always reference existing Sprint 5 knowledge-base records (Vendor, Product, Edition, Module) — they never duplicate product definitions. Referential integrity is enforced end-to-end: a Product must belong to its Vendor, an Edition to its Product, a Module to its Edition, and an Environment to the same Customer as the Assessment Project it's used in. A unique constraint on `(assessment_project, edition, environment)` prevents duplicate assignments.
+
+Each Assessment Project exposes an **informational dashboard** (`GET /assessment-projects/{id}/dashboard`) summarizing total deployed products, vendors in use, modules enabled, capabilities available, security domains represented, and frameworks represented — derived transitively through the Module → Capability → Domain/Framework chain. This is a rollup only; no coverage, gap, or overlap scoring is computed yet.
+
+Assessments support JSON export/import (`GET/POST /assessment-projects/{id}/export`, `POST /assessment-projects/import`) keyed by natural names (customer name, vendor/product/edition/module names, environment name) rather than raw database ids, so an export never leaks internal ids and re-importing an unchanged export reports every project/assignment as `unchanged`.
+
 ## Backend APIs
 
 Full CRUD + search + pagination is available for every knowledge base entity, documented in Swagger at `/docs`:
@@ -128,6 +152,28 @@ DELETE /product-mappings/bulk      delete a set of mapping ids
 ```
 
 `ProductCapabilityMapping` enforces a uniqueness constraint on `(module, capability, licensing_tier, deployment_model)` to prevent duplicate mappings, and validates that the vendor/product/edition/module chain is internally consistent (e.g. a product must actually belong to the given vendor) before allowing a write.
+
+The Customer Assessment Workspace adds:
+
+```
+GET/POST        /customers            /business-units       /environments
+GET/POST        /assessment-projects  /product-assignments
+GET/PUT/DELETE  .../{id}
+```
+
+```
+GET  /business-units?customer_id=
+GET  /environments?customer_id=&environment_type=
+GET  /assessment-projects?customer_id=&status=
+GET  /product-assignments?assessment_project_id=&vendor_id=&product_id=&edition_id=
+                          &environment_id=&deployment_model=&deployment_status=
+
+GET  /assessment-projects/{id}/dashboard   informational rollup (see above)
+GET  /assessment-projects/{id}/export      export the project + assignments as JSON
+POST /assessment-projects/import           idempotent upsert import from JSON
+```
+
+All list endpoints (including every knowledge base entity above) also accept `?sort_by=<column>&sort_desc=true|false`.
 
 ## Local Development
 
@@ -166,6 +212,8 @@ The Knowledge Base pages live under **Knowledge Base** in the sidebar (`/knowled
 
 - **Capabilities** additionally has domain/risk-category filter dropdowns and Import YAML / Export YAML buttons.
 - **Product Mappings** additionally has vendor/deployment-model/availability-status/licensing-tier filter dropdowns, Import YAML / Export YAML buttons, and **bulk editing**: select rows via checkboxes to bulk-set availability status or bulk-delete.
+
+**Customers** (`/customers`) lists onboarded customers. Selecting one opens its detail page (`/customers/{id}`), with tables for Business Units, Environments, and Assessment Projects, each with inline create/edit/delete. Selecting an Assessment Project opens `/assessments/{id}`: the dashboard cards described above, a Product Assignments table, and Import JSON / Export JSON buttons. **Add Product** opens a two-step wizard — vendor → product → edition, then modules/environment/license/deployment details — that only ever references existing knowledge-base records.
 
 ## Makefile Reference
 

@@ -31,6 +31,8 @@ class BaseRepository(Generic[ModelType]):
         limit: int = 50,
         search: Optional[str] = None,
         filters: Optional[dict] = None,
+        sort_by: Optional[str] = None,
+        sort_desc: bool = False,
     ) -> tuple[list[ModelType], int]:
         statement = select(self.model)
         count_statement = select(func.count()).select_from(self.model)
@@ -51,8 +53,14 @@ class BaseRepository(Generic[ModelType]):
             count_statement = count_statement.where(condition)
 
         total = self.session.exec(count_statement).one()
+
+        order_column = self.model.id
+        if sort_by and hasattr(self.model, sort_by):
+            order_column = getattr(self.model, sort_by)
+        order_clause = order_column.desc() if sort_desc else order_column.asc()
+
         items = self.session.exec(
-            statement.offset(skip).limit(limit).order_by(self.model.id)
+            statement.offset(skip).limit(limit).order_by(order_clause)
         ).all()
         return list(items), total
 
