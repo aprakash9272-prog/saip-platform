@@ -9,6 +9,7 @@ import {
   Package,
   Pencil,
   Plus,
+  ShieldAlert,
   ShieldCheck,
   Tags,
   Trash2,
@@ -288,6 +289,11 @@ export function AssessmentProjectPage({ projectId }: AssessmentProjectPageProps)
           </div>
         </div>
         <div className="flex gap-2">
+          <Button asChild variant="outline">
+            <Link href={`/assessments/${projectId}/gaps`}>
+              <ShieldAlert className="size-4" /> Gap Analysis
+            </Link>
+          </Button>
           <Button variant="outline" onClick={() => setProjectFormOpen(true)}>
             <Pencil className="size-4" /> Edit
           </Button>

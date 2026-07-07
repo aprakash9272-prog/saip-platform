@@ -54,6 +54,7 @@ class CapabilityYAML(BaseModel):
     domain: str = Field(min_length=1, description="Domain name this capability belongs to.")
     description: Optional[str] = None
     risk_category: Optional[str] = None
+    is_business_critical: bool = False
 
     @field_validator("code")
     @classmethod

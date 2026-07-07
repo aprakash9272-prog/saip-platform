@@ -26,6 +26,7 @@ export interface FieldConfig {
     | "text"
     | "textarea"
     | "number"
+    | "boolean"
     | "reference"
     | "multi-reference"
     | "select"

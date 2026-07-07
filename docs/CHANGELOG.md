@@ -2,6 +2,20 @@
 
 All notable changes to this project are documented in this file.
 
+## [v0.7.0-alpha] — 2026-07-07 — Gap Analysis Engine
+
+### Added
+- `GapEngine` (`app/engine/gap_engine.py`), built directly on `CoverageEngine`: identifies and classifies every missing capability from an assessment's coverage report. Pure identification/classification — no remediation recommendations.
+- Deterministic severity classification (Critical/High/Medium/Low/Informational) from a capability's risk category, its framework mapping count, and a new `is_business_critical` flag; a related but distinct business-impact classification (Severe/High/Moderate/Low).
+- `Capability.is_business_critical` boolean field (default `false`), added as a Gap Engine severity input — settable via the Capabilities API/UI or YAML import/export, alongside the existing `risk_category`.
+- Each gap includes the compliance framework controls mapped to it and candidate catalog products (from `ProductCapabilityMapping`) known to provide it, plus a fixed `"Open"` status.
+- Per-domain gap scores (coverage %, gap %, missing count, critical gap count, a blended 0-100 domain risk score) across all 18 domains, plus an overall gap percentage and risk score for the assessment.
+- `POST /analysis/gaps`, `GET /analysis/gaps/{assessment_id}`, `GET /analysis/gaps/export`, `GET /analysis/gaps/summary`, `GET /analysis/gaps/domains`, all documented in Swagger.
+- Excel (`openpyxl`, Summary/Domain Gap Scores/Gaps sheets) and PDF (`reportlab`, paginated) export, alongside JSON.
+- A dedicated Gap Analysis page (`/assessments/{id}/gaps`, linked from the Assessment Project page): executive summary, Critical Gap card grid, gaps-by-severity and gaps-by-domain bar charts, a domain risk heatmap, a severity × business-impact risk matrix, and a gap table with search, severity/domain filters, sortable columns, and JSON/Excel/PDF export.
+- A `"boolean"` field type in the generic config-driven CRUD form system (`entity-form-dialog.tsx`), used by the Capabilities form for `is_business_critical`.
+- Unit tests for severity/business-impact classification and domain/overall risk scoring, API integration tests for all five endpoints and all three export formats (plus a route-ordering regression guard for the static-vs-dynamic `/gaps/*` paths), and a performance test seeding a ~360-capability/60-assignment catalog with framework mappings and product mappings (152 backend tests total, all passing).
+
 ## [v0.6.0-alpha] — 2026-07-07 — Coverage Analysis Engine
 
 ### Added

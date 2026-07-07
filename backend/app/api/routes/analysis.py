@@ -9,12 +9,15 @@ from app.engine.coverage_export import (
     export_coverage_json,
     export_coverage_pdf,
 )
+from app.engine.gap_engine import GapEngine
+from app.engine.gap_export import export_gap_excel, export_gap_json, export_gap_pdf
 from app.schemas.coverage import (
     CapabilityMatrix,
     CoverageReport,
     CoverageRequest,
     DomainCoverage,
 )
+from app.schemas.gap import DomainGapScore, GapReport, GapRequest, GapSummary
 
 router = APIRouter(prefix="/analysis", tags=["analysis"])
 
@@ -91,3 +94,72 @@ def capability_matrix(assessment_id: int, session: SessionDep):
         missing=report.missing_capabilities,
         duplicate=report.duplicate_capabilities,
     )
+
+
+# --------------------------------------------------------------- Gap Analysis --
+# Static sibling paths (export/summary/domains) must be registered before the
+# dynamic /gaps/{assessment_id} route below, or FastAPI would try to parse
+# "export"/"summary"/"domains" as an assessment_id.
+
+
+@router.post(
+    "/gaps",
+    response_model=GapReport,
+    summary="Calculate the gap report for an assessment project",
+)
+def calculate_gaps(payload: GapRequest, session: SessionDep):
+    return GapEngine(session).calculate(payload.assessment_project_id)
+
+
+@router.get(
+    "/gaps/export",
+    summary="Export the gap report as JSON, Excel, or PDF",
+)
+def export_gaps(
+    session: SessionDep,
+    assessment_id: int,
+    format: str = Query("json", pattern="^(json|excel|pdf)$"),
+):
+    report = GapEngine(session).calculate(assessment_id)
+    if format == "excel":
+        content = export_gap_excel(report)
+    elif format == "pdf":
+        content = export_gap_pdf(report)
+    else:
+        content = export_gap_json(report)
+
+    filename = f"gaps-{assessment_id}.{_EXPORT_EXTENSIONS[format]}"
+    return Response(
+        content=content,
+        media_type=_EXPORT_MEDIA_TYPES[format],
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+    )
+
+
+@router.get(
+    "/gaps/summary",
+    response_model=GapSummary,
+    summary="Executive summary of the gap report for an assessment project",
+)
+def gap_summary(assessment_id: int, session: SessionDep):
+    report = GapEngine(session).calculate(assessment_id)
+    return GapSummary(**report.model_dump(exclude={"domain_gap_scores", "gaps"}))
+
+
+@router.get(
+    "/gaps/domains",
+    response_model=List[DomainGapScore],
+    summary="Domain-level gap breakdown for an assessment project",
+)
+def gap_domain_summary(assessment_id: int, session: SessionDep):
+    report = GapEngine(session).calculate(assessment_id)
+    return report.domain_gap_scores
+
+
+@router.get(
+    "/gaps/{assessment_id}",
+    response_model=GapReport,
+    summary="Get the gap report for an assessment project",
+)
+def get_gaps(assessment_id: int, session: SessionDep):
+    return GapEngine(session).calculate(assessment_id)

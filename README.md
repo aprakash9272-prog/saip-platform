@@ -6,7 +6,7 @@ See [docs/PROJECT_BLUEPRINT.md](docs/PROJECT_BLUEPRINT.md) for the full product 
 
 ## Project Status
 
-**Sprint 7 — Coverage Analysis Engine.** SAIP has its first real analysis engine. `CoverageEngine` calculates, for an assessment project, how much of the vendor-neutral capability catalog is actually covered by its **Deployed** product assignments: covered/missing/duplicate capabilities, per-domain coverage percentages (across all 18 domains), and an overall coverage score. This is a pure calculation — no gap remediation, no recommendations, no overlap scoring. Reports are exportable as JSON, Excel, or PDF, and the Assessment Project page now shows a Coverage Analysis dashboard (score, pie/bar charts, a domain heatmap, and a capability matrix). Builds on Sprint 6's `Customer`/`Assessment Project`/`Product Assignment` workspace, Sprint 5's `ProductCapabilityMapping` fact table, and Sprint 4's domain/capability taxonomy (18 domains, 324 capabilities). Gap, Overlap, Recommendation, Simulation, and AI Assistant engines are still not implemented — this sprint only calculates coverage.
+**Sprint 8 — Gap Analysis Engine.** Building directly on Sprint 7's `CoverageEngine`, `GapEngine` identifies and classifies every missing security capability for an assessment project: severity (Critical/High/Medium/Low/Informational, derived from risk category, framework mapping count, and a new `is_business_critical` capability flag), business impact, the compliance framework controls affected, and candidate catalog products that could provide it. Per-domain gap scores (coverage %, gap %, missing count, critical count, a blended 0-100 risk score) and an overall risk score round out the report. This is pure identification and classification — no remediation recommendations yet. Reports are exportable as JSON, Excel, or PDF, and a dedicated Gap Analysis page (executive summary, critical gap cards, a domain risk heatmap, a severity × business-impact risk matrix, and a filterable/sortable/searchable gap table with charts) is linked from every Assessment Project. Builds on Sprint 7's Coverage Analysis Engine, Sprint 6's Customer Assessment Workspace, Sprint 5's `ProductCapabilityMapping` fact table, and Sprint 4's domain/capability taxonomy. Overlap, Recommendation, Simulation, and AI Assistant engines are still not implemented — this sprint only identifies and classifies gaps.
 
 ## Monorepo Structure
 
@@ -18,18 +18,20 @@ backend/    FastAPI + SQLModel + Alembic service, PostgreSQL-backed
   app/services/     Business rules (uniqueness, referential checks, bulk ops)
   app/api/routes/   FastAPI routers (thin controllers)
   app/knowledge/    YAML knowledge base + importer/exporter (see below)
-  app/engine/       Analysis engines — coverage_engine.py implemented (Sprint 7);
-                    gap/overlap/recommendation/simulation/cost engines still placeholders
+  app/engine/       Analysis engines — coverage_engine.py and gap_engine.py implemented
+                    (Sprints 7-8); overlap/recommendation/simulation/cost engines still placeholders
   tests/            pytest suite (importer, validation, API, engine unit/perf tests)
 frontend/   Next.js 15 + TypeScript + Tailwind CSS + shadcn/ui dashboard
   src/app/(dashboard)/knowledge-base/    Knowledge Base pages (vendors, products, ...)
   src/app/(dashboard)/customers/         Customer list + detail (business units, environments, assessments)
   src/app/(dashboard)/assessments/[id]/  Assessment project page (dashboard, coverage analysis, product
                                           assignments, import/export)
+  src/app/(dashboard)/assessments/[id]/gaps/  Dedicated Gap Analysis page
   src/components/knowledge-base/         Config-driven CRUD table/form/detail components
   src/components/customers/              Customer detail + business unit/environment/assessment dialogs
   src/components/assessments/            Assessment project page, product assignment wizard, coverage
-                                          analysis section (charts + heatmap + capability matrix)
+                                          analysis section, and the Gap Analysis page (heatmap, risk
+                                          matrix, gap table with filters/search/sort, charts)
 docs/       Product blueprint and architecture documentation
 ```
 
@@ -143,6 +145,24 @@ A `CoverageReport` can be exported as **JSON**, **Excel** (multi-sheet workbook:
 
 On the Assessment Project page, the **Coverage Analysis** section shows a coverage score card, covered/missing/duplicate summary cards, a covered-vs-missing pie chart, a per-domain coverage bar chart, a domain heatmap, and a filterable capability matrix table — plus the JSON/Excel/PDF export buttons.
 
+## Gap Analysis Engine
+
+`GapEngine` (`backend/app/engine/gap_engine.py`) is built directly on top of `CoverageEngine` — it takes the coverage report's missing-capability list and classifies each one for risk triage. Like the Coverage Engine, it is a pure calculation: identification and classification only, no remediation recommendations.
+
+For every missing capability, the engine determines:
+
+- **Severity** (Critical / High / Medium / Low / Informational) — a deterministic score built from the capability's risk category (Critical/High/Medium/Low, from the knowledge base), how many compliance framework controls map to it, and whether it's flagged `is_business_critical` (a new boolean on `Capability`, defaulting to `false`, settable via the API, the Capabilities UI, or YAML import/export). Risk category alone lands on a sensible baseline tier (Critical → High, High → High, Medium → Medium, Low → Low); framework mapping count and business-criticality are what escalate a gap into the top Critical tier.
+- **Business impact** (Severe / High / Moderate / Low) — a related but distinct classification driven primarily by business-criticality, since a capability's operational impact isn't purely a function of technical risk.
+- **Framework controls** — every compliance control (framework name/version, control id/name) mapped to the missing capability, from the Sprint 3 framework mapping table.
+- **Mapped products** — vendor/product/edition combinations in the knowledge base already known to provide this capability (via Sprint 5's `ProductCapabilityMapping`), regardless of whether they're deployed in this assessment. This is informational enumeration, not a ranked recommendation.
+- **Status** — always `"Open"` in this sprint; acknowledging, accepting risk on, or remediating a gap is out of scope until a future Recommendation Engine.
+
+It then rolls this up into **domain gap scores** (coverage %, gap %, missing count, critical gap count, and a blended 0-100 domain risk score — half gap percentage, half average gap severity) for every domain, plus an overall gap percentage and overall risk score for the assessment.
+
+A `GapReport` exports as **JSON**, **Excel** (Summary / Domain Gap Scores / Gaps sheets), or **PDF** via `GET /analysis/gaps/export?assessment_id=&format=`.
+
+A dedicated **Gap Analysis** page (`/assessments/{id}/gaps`, linked from the Assessment Project page) shows an executive summary (overall risk score, gap counts by severity), a Critical Gap card grid, a domain risk heatmap, a severity × business-impact risk matrix, and a gap table with search, severity/domain filters, sortable columns, and bar charts (gaps by severity, gaps by domain) — plus the JSON/Excel/PDF export buttons.
+
 ## Backend APIs
 
 Full CRUD + search + pagination is available for every knowledge base entity, documented in Swagger at `/docs`:
@@ -209,6 +229,16 @@ GET  /analysis/domain-summary?assessment_id=    just the per-domain coverage bre
 GET  /analysis/capabilities?assessment_id=      the covered/missing/duplicate capability matrix
 ```
 
+The Gap Analysis Engine adds:
+
+```
+POST /analysis/gaps                          body: {"assessment_project_id": <id>} -> GapReport
+GET  /analysis/gaps/{assessment_id}           the same GapReport, by id
+GET  /analysis/gaps/export?assessment_id=     ?format=json|excel|pdf -> file download
+GET  /analysis/gaps/summary?assessment_id=    executive summary only (no gap/domain lists)
+GET  /analysis/gaps/domains?assessment_id=    just the per-domain gap score breakdown
+```
+
 ## Local Development
 
 ### Backend
@@ -248,6 +278,8 @@ The Knowledge Base pages live under **Knowledge Base** in the sidebar (`/knowled
 - **Product Mappings** additionally has vendor/deployment-model/availability-status/licensing-tier filter dropdowns, Import YAML / Export YAML buttons, and **bulk editing**: select rows via checkboxes to bulk-set availability status or bulk-delete.
 
 **Customers** (`/customers`) lists onboarded customers. Selecting one opens its detail page (`/customers/{id}`), with tables for Business Units, Environments, and Assessment Projects, each with inline create/edit/delete. Selecting an Assessment Project opens `/assessments/{id}`: the informational dashboard cards, a **Coverage Analysis** section (score card, pie/bar charts, domain heatmap, capability matrix, JSON/Excel/PDF export), a Product Assignments table, and Import JSON / Export JSON buttons. **Add Product** opens a two-step wizard — vendor → product → edition, then modules/environment/license/deployment details — that only ever references existing knowledge-base records.
+
+The **Gap Analysis** button on the Assessment Project page opens `/assessments/{id}/gaps`: an executive summary, a Critical Gap card grid, gaps-by-severity and gaps-by-domain bar charts, a domain risk heatmap, a severity × business-impact risk matrix, and a gap table with search, severity/domain filters, sortable columns, and JSON/Excel/PDF export.
 
 ## Makefile Reference
 

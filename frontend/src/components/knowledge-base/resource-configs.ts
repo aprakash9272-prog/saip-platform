@@ -297,6 +297,7 @@ export const capabilityCreateSchema = z.object({
   domain_id: z.coerce.number({ error: "Domain is required" }).int().positive(),
   description: optionalText,
   risk_category: optionalText,
+  is_business_critical: z.boolean().default(false),
 });
 export const capabilityUpdateSchema = capabilityCreateSchema.partial();
 
@@ -318,6 +319,11 @@ const capabilityConfig: ResourceConfig<Capability, CapabilityInput, Partial<Capa
       render: (item, refs) => refs.domains?.get(item.domain_id) ?? item.domain_id,
     },
     { key: "risk_category", header: "Risk Category" },
+    {
+      key: "is_business_critical",
+      header: "Business Critical",
+      render: (item) => (item.is_business_critical ? "Yes" : "—"),
+    },
   ],
   fields: [
     { name: "name", label: "Name", type: "text", required: true },
@@ -330,6 +336,7 @@ const capabilityConfig: ResourceConfig<Capability, CapabilityInput, Partial<Capa
       reference: { resourceKey: "domains", labelField: "name" },
     },
     { name: "risk_category", label: "Risk Category", type: "text" },
+    { name: "is_business_critical", label: "Business Critical", type: "boolean" },
     { name: "description", label: "Description", type: "textarea" },
   ],
   toFormValues: (item) => ({
@@ -337,6 +344,7 @@ const capabilityConfig: ResourceConfig<Capability, CapabilityInput, Partial<Capa
     code: item.code,
     domain_id: item.domain_id,
     risk_category: item.risk_category ?? "",
+    is_business_critical: item.is_business_critical,
     description: item.description ?? "",
   }),
 };

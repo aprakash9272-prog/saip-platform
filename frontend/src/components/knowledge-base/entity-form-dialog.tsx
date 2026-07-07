@@ -195,6 +195,28 @@ function FixedMultiSelectField({
   );
 }
 
+function BooleanField({
+  value,
+  onChange,
+  label,
+}: {
+  value: unknown;
+  onChange: (value: boolean) => void;
+  label: string;
+}) {
+  return (
+    <label className="flex items-center gap-2 text-sm">
+      <input
+        type="checkbox"
+        checked={Boolean(value)}
+        onChange={(event) => onChange(event.target.checked)}
+        className="size-4 rounded border-input"
+      />
+      {label}
+    </label>
+  );
+}
+
 export function EntityFormDialog({
   open,
   onOpenChange,
@@ -236,14 +258,25 @@ export function EntityFormDialog({
         <form onSubmit={submit} className="flex flex-col gap-4">
           {config.fields.map((field) => (
             <div key={field.name} className="flex flex-col gap-1.5">
-              <Label htmlFor={field.name}>
-                {field.label}
-                {field.required && <span className="text-destructive"> *</span>}
-              </Label>
+              {field.type !== "boolean" && (
+                <Label htmlFor={field.name}>
+                  {field.label}
+                  {field.required && <span className="text-destructive"> *</span>}
+                </Label>
+              )}
               <Controller
                 control={control}
                 name={field.name}
                 render={({ field: rhfField }) => {
+                  if (field.type === "boolean") {
+                    return (
+                      <BooleanField
+                        value={rhfField.value}
+                        onChange={rhfField.onChange}
+                        label={field.label}
+                      />
+                    );
+                  }
                   if (field.type === "textarea") {
                     return (
                       <Textarea

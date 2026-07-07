@@ -95,6 +95,7 @@ export interface Capability {
   domain_id: number;
   description: string | null;
   risk_category: string | null;
+  is_business_critical: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -105,6 +106,7 @@ export interface CapabilityInput {
   domain_id: number;
   description?: string | null;
   risk_category?: string | null;
+  is_business_critical?: boolean;
 }
 
 export interface CapabilityFacets {
@@ -437,3 +439,61 @@ export interface CoverageReport {
 }
 
 export type CoverageExportFormat = "json" | "excel" | "pdf";
+
+// -------------------------------------------------------- Gap Analysis --
+
+export const SEVERITY_LEVELS = ["Critical", "High", "Medium", "Low", "Informational"] as const;
+export type SeverityLevel = (typeof SEVERITY_LEVELS)[number];
+
+export interface FrameworkControlRef {
+  framework_name: string;
+  framework_version: string;
+  control_id: string;
+  control_name: string;
+}
+
+export interface GapItem {
+  id: number;
+  code: string;
+  name: string;
+  domain_id: number;
+  domain_name: string;
+  risk_category: string | null;
+  severity: string;
+  business_impact: string;
+  framework_controls: FrameworkControlRef[];
+  mapped_products: string[];
+  status: string;
+}
+
+export interface DomainGapScore {
+  domain_id: number;
+  domain_name: string;
+  coverage_percentage: number;
+  gap_percentage: number;
+  missing_count: number;
+  critical_gap_count: number;
+  domain_risk_score: number;
+}
+
+export interface GapSummary {
+  assessment_project_id: number;
+  assessment_project_name: string;
+  generated_at: string;
+  total_capabilities: number;
+  total_gaps: number;
+  critical_count: number;
+  high_count: number;
+  medium_count: number;
+  low_count: number;
+  informational_count: number;
+  overall_gap_percentage: number;
+  overall_risk_score: number;
+}
+
+export interface GapReport extends GapSummary {
+  domain_gap_scores: DomainGapScore[];
+  gaps: GapItem[];
+}
+
+export type GapExportFormat = "json" | "excel" | "pdf";

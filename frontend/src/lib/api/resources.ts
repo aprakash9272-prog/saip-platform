@@ -19,6 +19,7 @@ import type {
   CustomerInput,
   Domain,
   DomainCoverage,
+  DomainGapScore,
   DomainInput,
   Edition,
   EditionInput,
@@ -28,6 +29,9 @@ import type {
   FrameworkInput,
   FrameworkMapping,
   FrameworkMappingInput,
+  GapExportFormat,
+  GapReport,
+  GapSummary,
   Module,
   ModuleInput,
   Paginated,
@@ -338,5 +342,34 @@ export function downloadCoverageExport(
   return apiClient.getBlob(
     `/analysis/coverage/${assessmentProjectId}/export${qs}`,
     `coverage-${assessmentProjectId}.${format === "excel" ? "xlsx" : format}`,
+  );
+}
+
+// -------------------------------------------------------- Gap Analysis --
+
+export function getGapReport(assessmentProjectId: number): Promise<GapReport> {
+  return apiClient.get<GapReport>(`/analysis/gaps/${assessmentProjectId}`);
+}
+
+export function getGapSummary(assessmentProjectId: number): Promise<GapSummary> {
+  return apiClient.get<GapSummary>(
+    `/analysis/gaps/summary${buildQuery({ assessment_id: assessmentProjectId })}`,
+  );
+}
+
+export function getGapDomainScores(assessmentProjectId: number): Promise<DomainGapScore[]> {
+  return apiClient.get<DomainGapScore[]>(
+    `/analysis/gaps/domains${buildQuery({ assessment_id: assessmentProjectId })}`,
+  );
+}
+
+export function downloadGapExport(
+  assessmentProjectId: number,
+  format: GapExportFormat,
+): Promise<BlobDownload> {
+  const qs = buildQuery({ assessment_id: assessmentProjectId, format });
+  return apiClient.getBlob(
+    `/analysis/gaps/export${qs}`,
+    `gaps-${assessmentProjectId}.${format === "excel" ? "xlsx" : format}`,
   );
 }

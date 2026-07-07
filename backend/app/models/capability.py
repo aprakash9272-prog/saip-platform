@@ -16,6 +16,7 @@ class CapabilityBase(SQLModel):
     code: str = Field(max_length=100, index=True, unique=True)
     description: Optional[str] = Field(default=None)
     risk_category: Optional[str] = Field(default=None, max_length=100)
+    is_business_critical: bool = Field(default=False)
 
 
 class Capability(CapabilityBase, TimestampMixin, table=True):

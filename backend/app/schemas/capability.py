@@ -16,6 +16,7 @@ class CapabilityUpdate(SQLModel):
     domain_id: Optional[int] = None
     description: Optional[str] = None
     risk_category: Optional[str] = None
+    is_business_critical: Optional[bool] = None
 
 
 class CapabilityRead(CapabilityBase):

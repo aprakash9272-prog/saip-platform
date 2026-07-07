@@ -38,6 +38,14 @@ from app.schemas.framework_mapping import (
     FrameworkMappingRead,
     FrameworkMappingUpdate,
 )
+from app.schemas.gap import (
+    DomainGapScore,
+    FrameworkControlRef,
+    GapItem,
+    GapReport,
+    GapRequest,
+    GapSummary,
+)
 from app.schemas.module import ModuleCreate, ModuleRead, ModuleUpdate
 from app.schemas.product import ProductCreate, ProductRead, ProductUpdate
 from app.schemas.product_assignment import (
@@ -112,4 +120,10 @@ __all__ = [
     "DuplicateCapabilityItem",
     "DomainCoverage",
     "CapabilityMatrix",
+    "GapRequest",
+    "GapItem",
+    "FrameworkControlRef",
+    "DomainGapScore",
+    "GapSummary",
+    "GapReport",
 ]

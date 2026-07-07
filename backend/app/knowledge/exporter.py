@@ -23,6 +23,7 @@ def dump_capabilities_yaml(capabilities: List[Capability]) -> str:
             "domain": c.domain.name,
             "description": c.description,
             "risk_category": c.risk_category,
+            "is_business_critical": c.is_business_critical,
         }
         for c in sorted(capabilities, key=lambda c: c.code)
     ]
