@@ -61,6 +61,16 @@ from app.schemas.product_capability_mapping import (
     ProductCapabilityMappingRead,
     ProductCapabilityMappingUpdate,
 )
+from app.schemas.recommendation import (
+    CoverageForecast,
+    PriorityBreakdown,
+    ProductCandidate,
+    ProductComparisonEntry,
+    RecommendationItem,
+    RecommendationReport,
+    RecommendationRequest,
+    RecommendationSummary,
+)
 from app.schemas.vendor import VendorCreate, VendorRead, VendorUpdate
 
 __all__ = [
@@ -126,4 +136,12 @@ __all__ = [
     "DomainGapScore",
     "GapSummary",
     "GapReport",
+    "RecommendationRequest",
+    "ProductCandidate",
+    "RecommendationItem",
+    "PriorityBreakdown",
+    "ProductComparisonEntry",
+    "CoverageForecast",
+    "RecommendationSummary",
+    "RecommendationReport",
 ]

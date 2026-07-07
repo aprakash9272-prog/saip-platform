@@ -42,6 +42,9 @@ import type {
   ProductCapabilityMappingFacets,
   ProductCapabilityMappingInput,
   ProductInput,
+  RecommendationExportFormat,
+  RecommendationReport,
+  RecommendationSummary,
   Vendor,
   VendorInput,
 } from "@/lib/api/types";
@@ -371,5 +374,32 @@ export function downloadGapExport(
   return apiClient.getBlob(
     `/analysis/gaps/export${qs}`,
     `gaps-${assessmentProjectId}.${format === "excel" ? "xlsx" : format}`,
+  );
+}
+
+// ---------------------------------------------------- Recommendations --
+
+export function getRecommendationReport(
+  assessmentProjectId: number,
+): Promise<RecommendationReport> {
+  return apiClient.get<RecommendationReport>(`/analysis/recommendations/${assessmentProjectId}`);
+}
+
+export function getRecommendationSummary(
+  assessmentProjectId: number,
+): Promise<RecommendationSummary> {
+  return apiClient.get<RecommendationSummary>(
+    `/analysis/recommendations/summary${buildQuery({ assessment_id: assessmentProjectId })}`,
+  );
+}
+
+export function downloadRecommendationExport(
+  assessmentProjectId: number,
+  format: RecommendationExportFormat,
+): Promise<BlobDownload> {
+  const qs = buildQuery({ assessment_id: assessmentProjectId, format });
+  return apiClient.getBlob(
+    `/analysis/recommendations/export${qs}`,
+    `recommendations-${assessmentProjectId}.${format === "excel" ? "xlsx" : format}`,
   );
 }

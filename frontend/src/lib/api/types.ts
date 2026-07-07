@@ -497,3 +497,84 @@ export interface GapReport extends GapSummary {
 }
 
 export type GapExportFormat = "json" | "excel" | "pdf";
+
+// ---------------------------------------------------- Recommendations --
+
+export const PRIORITY_LEVELS = ["Critical", "High", "Medium", "Low"] as const;
+export type PriorityLevel = (typeof PRIORITY_LEVELS)[number];
+
+export interface ProductCandidate {
+  vendor: string;
+  product: string;
+  edition: string;
+  module: string;
+  licensing_tier: string | null;
+  deployment_model: string;
+  supported_platforms: string[];
+  availability_status: string;
+  already_deployed_vendor: boolean;
+  confidence_score: number;
+  implementation_complexity: string;
+  estimated_effort: string;
+}
+
+export interface RecommendationItem {
+  capability_id: number;
+  capability_code: string;
+  capability_name: string;
+  domain_id: number;
+  domain_name: string;
+  severity: string;
+  business_impact: string;
+  framework_controls: FrameworkControlRef[];
+  candidates: ProductCandidate[];
+  priority: string;
+  domain_coverage_improvement_percentage: number;
+  estimated_risk_reduction: number;
+}
+
+export interface PriorityBreakdown {
+  priority: string;
+  count: number;
+  capability_codes: string[];
+}
+
+export interface ProductComparisonEntry {
+  vendor: string;
+  product: string;
+  gaps_addressed: number;
+  average_confidence_score: number;
+  domains_covered: string[];
+}
+
+export interface CoverageForecast {
+  current_coverage_percentage: number;
+  projected_coverage_percentage: number;
+  addressable_gap_count: number;
+  unaddressable_gap_count: number;
+}
+
+export interface RecommendationSummary {
+  assessment_project_id: number;
+  assessment_project_name: string;
+  generated_at: string;
+  total_gaps: number;
+  addressable_gaps: number;
+  unaddressable_gaps: number;
+  critical_priority_count: number;
+  high_priority_count: number;
+  medium_priority_count: number;
+  low_priority_count: number;
+  current_risk_score: number;
+  projected_risk_score: number;
+  estimated_overall_risk_reduction: number;
+  coverage_forecast: CoverageForecast;
+}
+
+export interface RecommendationReport extends RecommendationSummary {
+  priority_matrix: PriorityBreakdown[];
+  product_comparison: ProductComparisonEntry[];
+  recommendations: RecommendationItem[];
+}
+
+export type RecommendationExportFormat = "json" | "excel" | "pdf";

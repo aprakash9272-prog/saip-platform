@@ -2,6 +2,19 @@
 
 All notable changes to this project are documented in this file.
 
+## [v0.8.0-alpha] — 2026-07-07 — Security Recommendation Engine
+
+### Added
+- `RecommendationEngine` (`app/engine/recommendation_engine.py`), built directly on `GapEngine`: recommends the catalog products, modules, and configurations that would close every addressable gap. Fully deterministic and knowledge-base-driven — no AI/LLM reasoning, no generated text.
+- For every gap, every matching `ProductCapabilityMapping` catalog row becomes a candidate recommendation with a confidence score (from availability status, +15 if the vendor is already deployed elsewhere in the assessment), implementation complexity (from deployment model, downgraded a tier for an already-deployed vendor), estimated effort, required license tier, deployment model, and platform support.
+- Deterministic 4-tier priority ranking (Critical/High/Medium/Low) from gap severity, business impact, framework-control count, the best candidate's implementation complexity, and whether closing the gap meaningfully moves an unusually small domain's coverage.
+- Per-gap `estimated_risk_reduction`: the precise marginal delta in the assessment's overall risk score if that one gap were closed, computed by re-running the Gap Engine's own risk-score formula with the gap removed — not a qualitative label.
+- Report-level coverage improvement forecast (current vs. projected coverage % if every addressable gap were closed), a priority matrix, and a cross-gap product comparison (which catalog products address the most gaps).
+- Gaps with zero catalog candidates are counted as unaddressable and produce no recommendation.
+- `POST /analysis/recommendations`, `GET /analysis/recommendations/{assessment_id}`, `GET /analysis/recommendations/export` (JSON/Excel/PDF), `GET /analysis/recommendations/summary`, documented in Swagger.
+- A dedicated Recommendations page (`/assessments/{id}/recommendations`, linked from the Assessment Project page): executive summary, coverage improvement forecast bar, Top Recommendations card grid, a priority-matrix bar chart, a product comparison table, and a recommendation table with search, priority/domain filters, and sortable columns.
+- Unit tests for confidence/complexity/priority scoring and risk-reduction calculation, API integration tests for all four endpoints and every export format (plus a route-ordering regression guard), and a performance test reusing the Sprint 8 bulk-catalog fixture (171 backend tests total, all passing).
+
 ## [v0.7.0-alpha] — 2026-07-07 — Gap Analysis Engine
 
 ### Added

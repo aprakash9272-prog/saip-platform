@@ -6,6 +6,7 @@ import {
   Building2,
   Download,
   Layers,
+  Lightbulb,
   Package,
   Pencil,
   Plus,
@@ -292,6 +293,11 @@ export function AssessmentProjectPage({ projectId }: AssessmentProjectPageProps)
           <Button asChild variant="outline">
             <Link href={`/assessments/${projectId}/gaps`}>
               <ShieldAlert className="size-4" /> Gap Analysis
+            </Link>
+          </Button>
+          <Button asChild variant="outline">
+            <Link href={`/assessments/${projectId}/recommendations`}>
+              <Lightbulb className="size-4" /> Recommendations
             </Link>
           </Button>
           <Button variant="outline" onClick={() => setProjectFormOpen(true)}>

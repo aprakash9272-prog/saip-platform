@@ -11,6 +11,12 @@ from app.engine.coverage_export import (
 )
 from app.engine.gap_engine import GapEngine
 from app.engine.gap_export import export_gap_excel, export_gap_json, export_gap_pdf
+from app.engine.recommendation_engine import RecommendationEngine
+from app.engine.recommendation_export import (
+    export_recommendation_excel,
+    export_recommendation_json,
+    export_recommendation_pdf,
+)
 from app.schemas.coverage import (
     CapabilityMatrix,
     CoverageReport,
@@ -18,6 +24,11 @@ from app.schemas.coverage import (
     DomainCoverage,
 )
 from app.schemas.gap import DomainGapScore, GapReport, GapRequest, GapSummary
+from app.schemas.recommendation import (
+    RecommendationReport,
+    RecommendationRequest,
+    RecommendationSummary,
+)
 
 router = APIRouter(prefix="/analysis", tags=["analysis"])
 
@@ -163,3 +174,63 @@ def gap_domain_summary(assessment_id: int, session: SessionDep):
 )
 def get_gaps(assessment_id: int, session: SessionDep):
     return GapEngine(session).calculate(assessment_id)
+
+
+# ----------------------------------------------------------- Recommendations --
+# Static sibling paths (export/summary) must be registered before the dynamic
+# /recommendations/{assessment_id} route below, same reasoning as /gaps above.
+
+
+@router.post(
+    "/recommendations",
+    response_model=RecommendationReport,
+    summary="Calculate the recommendation report for an assessment project",
+)
+def calculate_recommendations(payload: RecommendationRequest, session: SessionDep):
+    return RecommendationEngine(session).calculate(payload.assessment_project_id)
+
+
+@router.get(
+    "/recommendations/export",
+    summary="Export the recommendation report as JSON, Excel, or PDF",
+)
+def export_recommendations(
+    session: SessionDep,
+    assessment_id: int,
+    format: str = Query("json", pattern="^(json|excel|pdf)$"),
+):
+    report = RecommendationEngine(session).calculate(assessment_id)
+    if format == "excel":
+        content = export_recommendation_excel(report)
+    elif format == "pdf":
+        content = export_recommendation_pdf(report)
+    else:
+        content = export_recommendation_json(report)
+
+    filename = f"recommendations-{assessment_id}.{_EXPORT_EXTENSIONS[format]}"
+    return Response(
+        content=content,
+        media_type=_EXPORT_MEDIA_TYPES[format],
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+    )
+
+
+@router.get(
+    "/recommendations/summary",
+    response_model=RecommendationSummary,
+    summary="Executive summary of the recommendation report for an assessment project",
+)
+def recommendation_summary(assessment_id: int, session: SessionDep):
+    report = RecommendationEngine(session).calculate(assessment_id)
+    return RecommendationSummary(
+        **report.model_dump(exclude={"priority_matrix", "product_comparison", "recommendations"})
+    )
+
+
+@router.get(
+    "/recommendations/{assessment_id}",
+    response_model=RecommendationReport,
+    summary="Get the recommendation report for an assessment project",
+)
+def get_recommendations(assessment_id: int, session: SessionDep):
+    return RecommendationEngine(session).calculate(assessment_id)

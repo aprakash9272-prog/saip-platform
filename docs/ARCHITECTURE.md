@@ -31,9 +31,9 @@ api/routes/   FastAPI routers — thin controllers with no business logic
 
 Two router patterns coexist:
 - **Generic factory** (`api/routes/factory.py` → `build_crud_router`) for entities with no extra filters or sub-routes (e.g. products, editions).
-- **Bespoke routers** for entities needing custom filters, sub-routes, or read-shape projection (e.g. modules, product mappings, every Sprint 6 entity, and the Sprint 7-8 `/analysis` routes).
+- **Bespoke routers** for entities needing custom filters, sub-routes, or read-shape projection (e.g. modules, product mappings, every Sprint 6 entity, and the Sprint 7-9 `/analysis` routes).
 
-Route registration order matters where static and dynamic paths share a prefix: `/analysis/gaps/export`, `/analysis/gaps/summary`, and `/analysis/gaps/domains` are all registered *before* `/analysis/gaps/{assessment_id}` in `api/routes/analysis.py`, since FastAPI matches path operations in registration order and a dynamic segment would otherwise swallow the static ones.
+Route registration order matters where static and dynamic paths share a prefix: within `api/routes/analysis.py`, `/analysis/gaps/export`, `/analysis/gaps/summary`, and `/analysis/gaps/domains` are all registered *before* `/analysis/gaps/{assessment_id}`, and likewise `/analysis/recommendations/export` and `/analysis/recommendations/summary` before `/analysis/recommendations/{assessment_id}` — FastAPI matches path operations in registration order, and a dynamic segment would otherwise swallow the static ones.
 
 Cross-cutting infrastructure shared by all entities:
 - `PaginationParams` (`api/deps.py`): `skip`, `limit`, `search`, `sort_by`, `sort_desc` — applied uniformly by `BaseRepository.list()`.
@@ -69,7 +69,8 @@ Customer ──< BusinessUnit             │
 
 - `coverage_engine.py` (Sprint 7, implemented): `CoverageEngine.calculate(assessment_project_id)` reads the assessment project's `Deployed` product assignments, walks each assignment's modules → capabilities, and cross-references every `Capability` and `Domain` row in the catalog to produce a `CoverageReport` (covered/missing/duplicate capabilities, per-domain and overall coverage percentages). It is a read-only computation — nothing is written to the database, and repeated calls are idempotent and side-effect-free. `engine/coverage_export.py` renders that report as JSON, an `openpyxl` workbook, or a `reportlab` PDF.
 - `gap_engine.py` (Sprint 8, implemented): `GapEngine.calculate(assessment_project_id)` calls `CoverageEngine` internally and takes its `missing_capabilities` list as the sole input — it does not recompute coverage. For each missing capability it looks up the `Capability` row (risk category, `is_business_critical`), its `framework_mappings` (for both a count used in severity scoring and the full control list surfaced on the gap), and scans `ProductCapabilityMapping` for candidate catalog products. Severity and business impact are computed by small pure functions (`_classify_severity`, `_classify_business_impact`) so the scoring logic is unit-testable in isolation from the ORM. Domain and overall risk scores are a deterministic blend (`(gap_percentage + average_severity_weight) / 2`) — see the module docstring for the exact weights. `engine/gap_export.py` mirrors `coverage_export.py`'s JSON/Excel/PDF pattern.
-- `overlap_engine.py`, `recommendation_engine.py`, `simulation_engine.py`, `cost_engine.py` — placeholders (`raise NotImplementedError`) for future sprints.
+- `recommendation_engine.py` (Sprint 9, implemented): `RecommendationEngine.calculate(assessment_project_id)` calls `GapEngine` internally and treats its `gaps` list as the sole source of truth — it never recomputes coverage or gaps itself. For each gap it scans every `ProductCapabilityMapping` row matching that capability_id (regardless of whether that vendor is deployed in this assessment) and turns each into a `ProductCandidate`, computed by pure functions (`_confidence_score`, `_implementation_complexity`, `_classify_priority`) that take only primitive inputs — no AI/LLM calls, no ORM access — so the scoring logic is unit-testable in isolation. A gap's "already deployed vendor" signal comes from cross-referencing the assessment's `Deployed` `ProductAssignment` rows' `vendor_id` against each candidate's vendor. Per-gap `estimated_risk_reduction` is computed by re-running the same aggregate risk-score formula `GapEngine` uses, once with that gap removed from the totals — a real marginal-impact calculation, not a heuristic label. `engine/recommendation_export.py` mirrors the JSON/Excel/PDF pattern of the other two engines.
+- `overlap_engine.py`, `simulation_engine.py`, `cost_engine.py` — placeholders (`raise NotImplementedError`) for future sprints.
 
 ## Frontend: Next.js App Router
 
@@ -81,18 +82,18 @@ src/components/knowledge-base/ config-driven CRUD system shared by all catalog e
                                   data-table.tsx, entity-form-dialog.tsx, entity-detail-sheet.tsx
 src/components/customers/      Customer detail page + Business Unit/Environment/Assessment dialogs
 src/components/assessments/    Assessment project page, Product Assignment wizard, the Coverage
-                                Analysis section, and the dedicated Gap Analysis page (executive
-                                summary, critical gap cards, risk heatmap, risk matrix, filterable/
-                                sortable gap table, charts)
+                                Analysis section, the Gap Analysis page, and the Recommendations
+                                page (executive summary, top recommendations, coverage forecast,
+                                priority matrix, product comparison, filterable/sortable table)
 src/lib/api/                   typed fetch client, per-entity resource functions, shared TS types
 src/hooks/                     useResourceQueries (list/create/update/delete via TanStack Query),
                                 useResourceOptions (reference dropdowns), useReferenceMaps (id -> label)
 ```
 
-Flat catalog entities (vendors, products, customers, ...) go through the generic config-driven `ResourcePage`. Entities with nested detail views, cross-entity dashboards, cascading selection (vendor → product → edition → module), file import/export, or computed reports (Customer, Assessment Project, Product Assignment, Capabilities, Product Mappings, Coverage Analysis, Gap Analysis) use bespoke page components that compose the same shared UI primitives (`Dialog`, `Table`, `Card`, shadcn/ui) directly, plus `recharts` for charts. The Gap Analysis page (`/assessments/{id}/gaps`) is a standalone route rather than an embedded section — search/filter/sort state for a full gap table warranted its own page instead of crowding the Assessment Project page further.
+Flat catalog entities (vendors, products, customers, ...) go through the generic config-driven `ResourcePage`. Entities with nested detail views, cross-entity dashboards, cascading selection (vendor → product → edition → module), file import/export, or computed reports (Customer, Assessment Project, Product Assignment, Capabilities, Product Mappings, Coverage Analysis, Gap Analysis, Recommendations) use bespoke page components that compose the same shared UI primitives (`Dialog`, `Table`, `Card`, shadcn/ui) directly, plus `recharts` for charts. The Gap Analysis and Recommendations pages (`/assessments/{id}/gaps`, `/assessments/{id}/recommendations`) are standalone routes rather than embedded sections — search/filter/sort state for a full table warranted its own page instead of crowding the Assessment Project page further.
 
 The `FieldConfig` type in the generic config-driven CRUD system gained a `"boolean"` field type in Sprint 8 (rendered as a checkbox in `entity-form-dialog.tsx`), used by the Capabilities form for `is_business_critical` — the first boolean field in that system.
 
 ## What's Deliberately Not Built Yet
 
-Sections 9–13 of the [Project Blueprint](PROJECT_BLUEPRINT.md) describe a Coverage Engine, Gap Engine, Overlap Engine, Recommendation Engine, Simulation Engine, and AI Assistant. The Coverage and Gap Engines are implemented as of Sprints 7-8 (see above) — the other four are still `NotImplementedError` placeholders in `app/engine/`. Sprints 3–8 exist to build the knowledge base, the customer assessment workspace, and now coverage/gap calculation; overlap/redundancy scoring, remediation recommendations, simulation, and AI reasoning are future sprints.
+Sections 9–13 of the [Project Blueprint](PROJECT_BLUEPRINT.md) describe a Coverage Engine, Gap Engine, Overlap Engine, Recommendation Engine, Simulation Engine, and AI Assistant. The Coverage, Gap, and Recommendation Engines are implemented as of Sprints 7-9 (see above) — Overlap, Simulation, and the AI Assistant are still `NotImplementedError` placeholders in `app/engine/`. Sprints 3–9 exist to build the knowledge base, the customer assessment workspace, and now coverage/gap/recommendation calculation; overlap/redundancy scoring, simulation, and AI reasoning are future sprints.
