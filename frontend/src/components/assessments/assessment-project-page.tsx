@@ -51,6 +51,7 @@ import {
 } from "@/lib/api/resources";
 import type { ProductAssignment } from "@/lib/api/types";
 
+import { CoverageAnalysisSection } from "./coverage-analysis-section";
 import { ProductAssignmentEditDialog } from "./product-assignment-edit-dialog";
 import { ProductAssignmentWizard } from "./product-assignment-wizard";
 
@@ -319,6 +320,9 @@ export function AssessmentProjectPage({ projectId }: AssessmentProjectPageProps)
           ))}
         </div>
       </div>
+
+      {/* Coverage Analysis */}
+      <CoverageAnalysisSection projectId={projectId} />
 
       {/* Product Assignments */}
       <Card>

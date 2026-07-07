@@ -2,6 +2,17 @@
 
 All notable changes to this project are documented in this file.
 
+## [v0.6.0-alpha] — 2026-07-07 — Coverage Analysis Engine
+
+### Added
+- `CoverageEngine` (`app/engine/coverage_engine.py`): the first real analysis engine, calculating capability coverage for an assessment project from its `Deployed` product assignments. Not Started, In Progress, and Decommissioned assignments do not count — only what is actually deployed today contributes coverage.
+- Coverage calculation determines, for every capability in the catalog: covered / missing / duplicate status and the deployed products providing it. Duplicates are counted per distinct deployed product, so multiple modules on the same product providing the same capability are not flagged as redundant.
+- Domain-level coverage (covered/total/percentage) across all 18 security domains, plus an overall coverage percentage for the assessment.
+- `GET /analysis/coverage/{assessment_id}`, `POST /analysis/coverage`, `GET /analysis/domain-summary`, `GET /analysis/capabilities`, and `GET /analysis/coverage/{assessment_id}/export?format=json|excel|pdf`.
+- Excel (`openpyxl`) and PDF (`reportlab`) export of the coverage report, alongside JSON.
+- Frontend Coverage Analysis section on the Assessment Project page: a coverage score card, covered/missing/duplicate summary cards, a covered-vs-missing pie chart, a per-domain coverage bar chart, a domain heatmap, a filterable capability matrix table, and JSON/Excel/PDF export buttons (using `recharts`).
+- Unit tests for the engine's coverage/duplicate-detection logic, API integration tests for all five endpoints and all three export formats, and a performance test seeding a ~360-capability, 60-assignment catalog directly at the model layer.
+
 ## [v0.5.0-alpha] — 2026-07-07 — Customer Assessment Workspace
 
 ### Added

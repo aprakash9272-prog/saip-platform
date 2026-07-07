@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import List, Optional
 
 from sqlmodel import Session
 
@@ -14,3 +14,7 @@ class DomainRepository(BaseRepository[Domain]):
 
     def get_by_name(self, name: str) -> Optional[Domain]:
         return self.get_by(name=name)
+
+    def all(self) -> List[Domain]:
+        items, _ = self.list(skip=0, limit=1_000_000)
+        return items

@@ -5,6 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from app.api.routes import (
+    analysis,
     assessment_projects,
     business_units,
     capabilities,
@@ -84,6 +85,7 @@ app.include_router(business_units.router)
 app.include_router(environments.router)
 app.include_router(assessment_projects.router)
 app.include_router(product_assignments.router)
+app.include_router(analysis.router)
 
 
 @app.on_event("startup")

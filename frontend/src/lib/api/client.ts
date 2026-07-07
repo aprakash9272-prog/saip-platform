@@ -55,9 +55,33 @@ async function requestFile<T>(path: string, file: File): Promise<T> {
   return (await res.json()) as T;
 }
 
+export interface BlobDownload {
+  blob: Blob;
+  filename: string;
+}
+
+function filenameFromContentDisposition(header: string | null, fallback: string): string {
+  const match = header?.match(/filename="?([^"]+)"?/);
+  return match?.[1] ?? fallback;
+}
+
+async function requestBlob(path: string, fallbackFilename: string): Promise<BlobDownload> {
+  const res = await fetch(`${API_URL}${path}`);
+  if (!res.ok) {
+    throw new ApiError(res.status, await readErrorMessage(res, res.statusText));
+  }
+  const blob = await res.blob();
+  const filename = filenameFromContentDisposition(
+    res.headers.get("content-disposition"),
+    fallbackFilename,
+  );
+  return { blob, filename };
+}
+
 export const apiClient = {
   get: <T>(path: string) => request<T>(path),
   getText: (path: string) => requestText(path),
+  getBlob: (path: string, fallbackFilename: string) => requestBlob(path, fallbackFilename),
   post: <T>(path: string, body: unknown) =>
     request<T>(path, { method: "POST", body: JSON.stringify(body) }),
   postFile: <T>(path: string, file: File) => requestFile<T>(path, file),

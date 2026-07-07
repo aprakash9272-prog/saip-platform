@@ -383,3 +383,57 @@ export interface AssessmentImportResult {
   assignments_updated: number;
   assignments_unchanged: number;
 }
+
+// --------------------------------------------------- Coverage Analysis --
+
+export interface CapabilityCoverageItem {
+  id: number;
+  code: string;
+  name: string;
+  domain_id: number;
+  domain_name: string;
+  covered: boolean;
+  provider_count: number;
+  providers: string[];
+}
+
+export interface DuplicateCapabilityItem {
+  id: number;
+  code: string;
+  name: string;
+  domain_id: number;
+  domain_name: string;
+  provider_count: number;
+  providers: string[];
+}
+
+export interface DomainCoverage {
+  domain_id: number;
+  domain_name: string;
+  covered_count: number;
+  total_count: number;
+  coverage_percentage: number;
+}
+
+export interface CapabilityMatrix {
+  covered: CapabilityCoverageItem[];
+  missing: CapabilityCoverageItem[];
+  duplicate: DuplicateCapabilityItem[];
+}
+
+export interface CoverageReport {
+  assessment_project_id: number;
+  assessment_project_name: string;
+  generated_at: string;
+  total_capabilities: number;
+  covered_capability_count: number;
+  missing_capability_count: number;
+  duplicate_capability_count: number;
+  overall_coverage_percentage: number;
+  domain_coverage: DomainCoverage[];
+  covered_capabilities: CapabilityCoverageItem[];
+  missing_capabilities: CapabilityCoverageItem[];
+  duplicate_capabilities: DuplicateCapabilityItem[];
+}
+
+export type CoverageExportFormat = "json" | "excel" | "pdf";

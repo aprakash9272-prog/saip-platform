@@ -15,6 +15,14 @@ from app.schemas.business_unit import (
 )
 from app.schemas.capability import CapabilityCreate, CapabilityRead, CapabilityUpdate
 from app.schemas.common import PaginatedResponse
+from app.schemas.coverage import (
+    CapabilityCoverageItem,
+    CapabilityMatrix,
+    CoverageReport,
+    CoverageRequest,
+    DomainCoverage,
+    DuplicateCapabilityItem,
+)
 from app.schemas.customer import CustomerCreate, CustomerRead, CustomerUpdate
 from app.schemas.dashboard import AssessmentDashboard
 from app.schemas.domain import DomainCreate, DomainRead, DomainUpdate
@@ -98,4 +106,10 @@ __all__ = [
     "AssessmentProjectExport",
     "ProductAssignmentExport",
     "AssessmentImportResult",
+    "CoverageRequest",
+    "CoverageReport",
+    "CapabilityCoverageItem",
+    "DuplicateCapabilityItem",
+    "DomainCoverage",
+    "CapabilityMatrix",
 ]

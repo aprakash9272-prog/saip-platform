@@ -6,7 +6,7 @@ See [docs/PROJECT_BLUEPRINT.md](docs/PROJECT_BLUEPRINT.md) for the full product 
 
 ## Project Status
 
-**Sprint 6 — Customer Assessment Workspace.** The platform now has a customer/project layer that represents a real organization's security environment: `Customer` → `Business Unit` / `Environment` / `Assessment Project`, and `Assessment Project` → `Product Assignment` (referencing existing Sprint 5 Vendor/Product/Edition/Module records — never duplicating catalog data). Each assignment tracks modules enabled, license quantity, deployment model, deployment status, environment, and notes. An informational dashboard rolls up deployed products, vendors, modules, capabilities, domains, and frameworks represented in an assessment — no coverage/gap/overlap scoring yet. Assessments support JSON export/import keyed by natural names (idempotent re-import). Builds on Sprint 5's `ProductCapabilityMapping` fact table (7 named vendors), Sprint 4's domain taxonomy (18 domains, 324 capabilities), and the Sprint 3 foundation (vendors, products, editions, modules, frameworks, framework mappings). No analysis logic (coverage, gap, overlap, recommendation, simulation, AI) has been implemented yet — these sprints only build the workspace and knowledge foundation those future engines will read from.
+**Sprint 7 — Coverage Analysis Engine.** SAIP has its first real analysis engine. `CoverageEngine` calculates, for an assessment project, how much of the vendor-neutral capability catalog is actually covered by its **Deployed** product assignments: covered/missing/duplicate capabilities, per-domain coverage percentages (across all 18 domains), and an overall coverage score. This is a pure calculation — no gap remediation, no recommendations, no overlap scoring. Reports are exportable as JSON, Excel, or PDF, and the Assessment Project page now shows a Coverage Analysis dashboard (score, pie/bar charts, a domain heatmap, and a capability matrix). Builds on Sprint 6's `Customer`/`Assessment Project`/`Product Assignment` workspace, Sprint 5's `ProductCapabilityMapping` fact table, and Sprint 4's domain/capability taxonomy (18 domains, 324 capabilities). Gap, Overlap, Recommendation, Simulation, and AI Assistant engines are still not implemented — this sprint only calculates coverage.
 
 ## Monorepo Structure
 
@@ -18,15 +18,18 @@ backend/    FastAPI + SQLModel + Alembic service, PostgreSQL-backed
   app/services/     Business rules (uniqueness, referential checks, bulk ops)
   app/api/routes/   FastAPI routers (thin controllers)
   app/knowledge/    YAML knowledge base + importer/exporter (see below)
-  app/engine/       Future analysis engines (coverage/gap/overlap/...) — not implemented yet
-  tests/            pytest suite (importer, validation, API)
+  app/engine/       Analysis engines — coverage_engine.py implemented (Sprint 7);
+                    gap/overlap/recommendation/simulation/cost engines still placeholders
+  tests/            pytest suite (importer, validation, API, engine unit/perf tests)
 frontend/   Next.js 15 + TypeScript + Tailwind CSS + shadcn/ui dashboard
   src/app/(dashboard)/knowledge-base/    Knowledge Base pages (vendors, products, ...)
   src/app/(dashboard)/customers/         Customer list + detail (business units, environments, assessments)
-  src/app/(dashboard)/assessments/[id]/  Assessment project page (dashboard, product assignments, import/export)
+  src/app/(dashboard)/assessments/[id]/  Assessment project page (dashboard, coverage analysis, product
+                                          assignments, import/export)
   src/components/knowledge-base/         Config-driven CRUD table/form/detail components
   src/components/customers/              Customer detail + business unit/environment/assessment dialogs
-  src/components/assessments/            Assessment project page + product assignment wizard
+  src/components/assessments/            Assessment project page, product assignment wizard, coverage
+                                          analysis section (charts + heatmap + capability matrix)
 docs/       Product blueprint and architecture documentation
 ```
 
@@ -119,6 +122,27 @@ Each Assessment Project exposes an **informational dashboard** (`GET /assessment
 
 Assessments support JSON export/import (`GET/POST /assessment-projects/{id}/export`, `POST /assessment-projects/import`) keyed by natural names (customer name, vendor/product/edition/module names, environment name) rather than raw database ids, so an export never leaks internal ids and re-importing an unchanged export reports every project/assignment as `unchanged`.
 
+## Coverage Analysis Engine
+
+`CoverageEngine` (`backend/app/engine/coverage_engine.py`) calculates, for a single assessment project, how much of the vendor-neutral capability catalog is actually covered by its deployed products. It is a pure calculation — no gap remediation, no overlap scoring, no recommendations; those are separate future engines.
+
+**Only Product Assignments with `deployment_status == "Deployed"` count.** A product that is Not Started, In Progress, or Decommissioned is not actually protecting the environment today, so it does not contribute coverage — this is the key distinction from Sprint 6's informational dashboard, which counts every assignment regardless of status.
+
+For every capability in the catalog, the engine determines:
+
+- **Covered** — provided by at least one deployed assignment's module.
+- **Missing** — provided by none.
+- **Duplicate** — provided by more than one *different* deployed product (two modules on the *same* assignment providing the same capability is not a duplicate — that's one product, not redundancy).
+
+It then rolls this up into:
+
+- **Domain coverage** — covered/total/percentage for every one of the 18 security domains in the taxonomy (Identity & Access Management, Endpoint Security, Network Security, Cloud Security, Application Security, Data Security & Privacy, Threat Intelligence, Security Operations & Incident Response, Vulnerability & Exposure Management, Governance Risk & Compliance, Email & Collaboration Security, Zero Trust & Network Access, DevSecOps & Software Supply Chain Security, API Security, Container & Kubernetes Security, IoT & OT Security, Encryption & Key Management, Business Continuity & Disaster Recovery).
+- **Overall coverage score** — covered capabilities ÷ total capabilities across the whole catalog.
+
+A `CoverageReport` can be exported as **JSON**, **Excel** (multi-sheet workbook: summary, domain coverage, covered/missing/duplicate capability lists), or **PDF** (a formatted, paginated report) via `GET /analysis/coverage/{id}/export?format=`.
+
+On the Assessment Project page, the **Coverage Analysis** section shows a coverage score card, covered/missing/duplicate summary cards, a covered-vs-missing pie chart, a per-domain coverage bar chart, a domain heatmap, and a filterable capability matrix table — plus the JSON/Excel/PDF export buttons.
+
 ## Backend APIs
 
 Full CRUD + search + pagination is available for every knowledge base entity, documented in Swagger at `/docs`:
@@ -175,6 +199,16 @@ POST /assessment-projects/import           idempotent upsert import from JSON
 
 All list endpoints (including every knowledge base entity above) also accept `?sort_by=<column>&sort_desc=true|false`.
 
+The Coverage Analysis Engine adds:
+
+```
+POST /analysis/coverage                        body: {"assessment_project_id": <id>} -> CoverageReport
+GET  /analysis/coverage/{assessment_id}         the same CoverageReport, by id
+GET  /analysis/coverage/{assessment_id}/export  ?format=json|excel|pdf -> file download
+GET  /analysis/domain-summary?assessment_id=    just the per-domain coverage breakdown
+GET  /analysis/capabilities?assessment_id=      the covered/missing/duplicate capability matrix
+```
+
 ## Local Development
 
 ### Backend
@@ -213,7 +247,7 @@ The Knowledge Base pages live under **Knowledge Base** in the sidebar (`/knowled
 - **Capabilities** additionally has domain/risk-category filter dropdowns and Import YAML / Export YAML buttons.
 - **Product Mappings** additionally has vendor/deployment-model/availability-status/licensing-tier filter dropdowns, Import YAML / Export YAML buttons, and **bulk editing**: select rows via checkboxes to bulk-set availability status or bulk-delete.
 
-**Customers** (`/customers`) lists onboarded customers. Selecting one opens its detail page (`/customers/{id}`), with tables for Business Units, Environments, and Assessment Projects, each with inline create/edit/delete. Selecting an Assessment Project opens `/assessments/{id}`: the dashboard cards described above, a Product Assignments table, and Import JSON / Export JSON buttons. **Add Product** opens a two-step wizard — vendor → product → edition, then modules/environment/license/deployment details — that only ever references existing knowledge-base records.
+**Customers** (`/customers`) lists onboarded customers. Selecting one opens its detail page (`/customers/{id}`), with tables for Business Units, Environments, and Assessment Projects, each with inline create/edit/delete. Selecting an Assessment Project opens `/assessments/{id}`: the informational dashboard cards, a **Coverage Analysis** section (score card, pie/bar charts, domain heatmap, capability matrix, JSON/Excel/PDF export), a Product Assignments table, and Import JSON / Export JSON buttons. **Add Product** opens a two-step wizard — vendor → product → edition, then modules/environment/license/deployment details — that only ever references existing knowledge-base records.
 
 ## Makefile Reference
 

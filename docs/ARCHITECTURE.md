@@ -31,7 +31,7 @@ api/routes/   FastAPI routers — thin controllers with no business logic
 
 Two router patterns coexist:
 - **Generic factory** (`api/routes/factory.py` → `build_crud_router`) for entities with no extra filters or sub-routes (e.g. products, editions).
-- **Bespoke routers** for entities needing custom filters, sub-routes, or read-shape projection (e.g. modules, product mappings, and every Sprint 6 entity).
+- **Bespoke routers** for entities needing custom filters, sub-routes, or read-shape projection (e.g. modules, product mappings, every Sprint 6 entity, and the Sprint 7 `/analysis` routes).
 
 Cross-cutting infrastructure shared by all entities:
 - `PaginationParams` (`api/deps.py`): `skip`, `limit`, `search`, `sort_by`, `sort_desc` — applied uniformly by `BaseRepository.list()`.
@@ -60,6 +60,13 @@ Customer ──< BusinessUnit             │
 - Referential integrity is enforced at both the database level (foreign keys, unique constraints) and the service layer (`validate_references` cross-checks the hierarchy is internally consistent — e.g. a `ProductAssignment`'s product must belong to its vendor, and its environment must belong to the same customer as its assessment project).
 - Migrations are managed with Alembic (`backend/alembic/versions/`); one revision per sprint's schema changes, applied automatically on container startup.
 
+## Analysis Engines
+
+`backend/app/engine/` holds the analysis layer described in Section 9 of the Project Blueprint — one module per engine, called from bespoke routes rather than the generic CRUD stack since engines compute derived reports, not persisted rows.
+
+- `coverage_engine.py` (Sprint 7, implemented): `CoverageEngine.calculate(assessment_project_id)` reads the assessment project's `Deployed` product assignments, walks each assignment's modules → capabilities, and cross-references every `Capability` and `Domain` row in the catalog to produce a `CoverageReport` (covered/missing/duplicate capabilities, per-domain and overall coverage percentages). It is a read-only computation — nothing is written to the database, and repeated calls are idempotent and side-effect-free. `engine/coverage_export.py` renders that report as JSON, an `openpyxl` workbook, or a `reportlab` PDF.
+- `gap_engine.py`, `overlap_engine.py`, `recommendation_engine.py`, `simulation_engine.py`, `cost_engine.py` — placeholders (`raise NotImplementedError`) for future sprints.
+
 ## Frontend: Next.js App Router
 
 ```
@@ -69,14 +76,16 @@ src/components/knowledge-base/ config-driven CRUD system shared by all catalog e
                                   resource-page.tsx     generic list/create/edit/delete page
                                   data-table.tsx, entity-form-dialog.tsx, entity-detail-sheet.tsx
 src/components/customers/      Customer detail page + Business Unit/Environment/Assessment dialogs
-src/components/assessments/    Assessment project page + Product Assignment wizard
+src/components/assessments/    Assessment project page, Product Assignment wizard, and the Coverage
+                                Analysis section (recharts pie/bar charts, a CSS-grid domain heatmap,
+                                and a covered/missing/duplicate capability matrix table)
 src/lib/api/                   typed fetch client, per-entity resource functions, shared TS types
 src/hooks/                     useResourceQueries (list/create/update/delete via TanStack Query),
                                 useResourceOptions (reference dropdowns), useReferenceMaps (id -> label)
 ```
 
-Flat catalog entities (vendors, products, customers, ...) go through the generic config-driven `ResourcePage`. Entities with nested detail views, cross-entity dashboards, cascading selection (vendor → product → edition → module), or file import/export (Customer, Assessment Project, Product Assignment, Capabilities, Product Mappings) use bespoke page components that compose the same shared UI primitives (`Dialog`, `Table`, `Card`, shadcn/ui) directly.
+Flat catalog entities (vendors, products, customers, ...) go through the generic config-driven `ResourcePage`. Entities with nested detail views, cross-entity dashboards, cascading selection (vendor → product → edition → module), file import/export, or computed reports (Customer, Assessment Project, Product Assignment, Capabilities, Product Mappings, Coverage Analysis) use bespoke page components that compose the same shared UI primitives (`Dialog`, `Table`, `Card`, shadcn/ui) directly, plus `recharts` for the coverage charts.
 
 ## What's Deliberately Not Built Yet
 
-Sections 9–13 of the [Project Blueprint](PROJECT_BLUEPRINT.md) describe a Coverage Engine, Gap Engine, Overlap Engine, Recommendation Engine, Simulation Engine, and AI Assistant. None of these exist yet. Sprints 3–6 exist solely to build the knowledge base (vendors/products/capabilities/frameworks) and the customer assessment workspace (customers/environments/assessment projects/product assignments) that those engines will read from — the assessment dashboard is explicitly informational-only, with no scoring logic.
+Sections 9–13 of the [Project Blueprint](PROJECT_BLUEPRINT.md) describe a Coverage Engine, Gap Engine, Overlap Engine, Recommendation Engine, Simulation Engine, and AI Assistant. The Coverage Engine is implemented as of Sprint 7 (see above) — the other five are still `NotImplementedError` placeholders in `app/engine/`. Sprints 3–7 exist to build the knowledge base, the customer assessment workspace, and now coverage calculation; gap remediation, overlap/redundancy scoring, recommendations, simulation, and AI reasoning are future sprints.

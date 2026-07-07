@@ -1,4 +1,4 @@
-import { apiClient } from "@/lib/api/client";
+import { apiClient, type BlobDownload } from "@/lib/api/client";
 import type {
   AssessmentDashboard,
   AssessmentImportResult,
@@ -12,9 +12,13 @@ import type {
   CapabilityFacets,
   CapabilityImportSummary,
   CapabilityInput,
+  CapabilityMatrix,
+  CoverageExportFormat,
+  CoverageReport,
   Customer,
   CustomerInput,
   Domain,
+  DomainCoverage,
   DomainInput,
   Edition,
   EditionInput,
@@ -306,4 +310,33 @@ export function listProductAssignments(
     deployment_status: params.deployment_status,
   });
   return apiClient.get<Paginated<ProductAssignment>>(`/product-assignments${qs}`);
+}
+
+// --------------------------------------------------- Coverage Analysis --
+
+export function getCoverageReport(assessmentProjectId: number): Promise<CoverageReport> {
+  return apiClient.get<CoverageReport>(`/analysis/coverage/${assessmentProjectId}`);
+}
+
+export function getDomainSummary(assessmentProjectId: number): Promise<DomainCoverage[]> {
+  return apiClient.get<DomainCoverage[]>(
+    `/analysis/domain-summary${buildQuery({ assessment_id: assessmentProjectId })}`,
+  );
+}
+
+export function getCapabilityMatrix(assessmentProjectId: number): Promise<CapabilityMatrix> {
+  return apiClient.get<CapabilityMatrix>(
+    `/analysis/capabilities${buildQuery({ assessment_id: assessmentProjectId })}`,
+  );
+}
+
+export function downloadCoverageExport(
+  assessmentProjectId: number,
+  format: CoverageExportFormat,
+): Promise<BlobDownload> {
+  const qs = buildQuery({ format });
+  return apiClient.getBlob(
+    `/analysis/coverage/${assessmentProjectId}/export${qs}`,
+    `coverage-${assessmentProjectId}.${format === "excel" ? "xlsx" : format}`,
+  );
 }
