@@ -34,6 +34,9 @@ import type {
   GapSummary,
   Module,
   ModuleInput,
+  OverlapExportFormat,
+  OverlapReport,
+  OverlapSummary,
   Paginated,
   Product,
   ProductAssignment,
@@ -401,5 +404,28 @@ export function downloadRecommendationExport(
   return apiClient.getBlob(
     `/analysis/recommendations/export${qs}`,
     `recommendations-${assessmentProjectId}.${format === "excel" ? "xlsx" : format}`,
+  );
+}
+
+// ------------------------------------------------- Overlap & Optimization --
+
+export function getOverlapReport(assessmentProjectId: number): Promise<OverlapReport> {
+  return apiClient.get<OverlapReport>(`/analysis/overlap/${assessmentProjectId}`);
+}
+
+export function getOverlapSummary(assessmentProjectId: number): Promise<OverlapSummary> {
+  return apiClient.get<OverlapSummary>(
+    `/analysis/overlap/summary${buildQuery({ assessment_id: assessmentProjectId })}`,
+  );
+}
+
+export function downloadOverlapExport(
+  assessmentProjectId: number,
+  format: OverlapExportFormat,
+): Promise<BlobDownload> {
+  const qs = buildQuery({ assessment_id: assessmentProjectId, format });
+  return apiClient.getBlob(
+    `/analysis/overlap/export${qs}`,
+    `overlap-${assessmentProjectId}.${format === "excel" ? "xlsx" : format}`,
   );
 }

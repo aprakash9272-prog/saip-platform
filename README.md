@@ -6,7 +6,7 @@ See [docs/PROJECT_BLUEPRINT.md](docs/PROJECT_BLUEPRINT.md) for the full product 
 
 ## Project Status
 
-**Sprint 9 — Security Recommendation Engine.** Building directly on Sprint 8's `GapEngine`, `RecommendationEngine` recommends the catalog products, modules, and configurations that would close each identified gap — deterministically, from existing `ProductCapabilityMapping` rows, with **no AI/LLM reasoning**. For every addressable gap it surfaces every candidate product (module, license tier, deployment model, platform support), a confidence score, implementation complexity, estimated effort, and a 4-tier priority (Critical/High/Medium/Low) ranked from gap severity, business criticality, framework impact, and implementation effort. The report also forecasts coverage improvement and estimated risk reduction if every recommendation were implemented, plus a cross-gap product comparison. Reports are exportable as JSON, Excel, or PDF, and a dedicated Recommendations page (executive summary, top recommendations, coverage forecast, priority matrix, product comparison, and a filterable/sortable/searchable recommendation table) is linked from every Assessment Project. Builds on Sprint 8's Gap Analysis Engine, Sprint 7's Coverage Analysis Engine, Sprint 6's Customer Assessment Workspace, and Sprint 5's `ProductCapabilityMapping` fact table. Simulation, Overlap Analysis, and AI Assistant engines are still not implemented.
+**Sprint 10 — Security Overlap & Optimization Engine.** `OverlapEngine` closes out the analysis suite by identifying redundancy and consolidation opportunities across an assessment's deployed products — **deterministic rules only, no AI reasoning**. It detects duplicate capabilities (and specifically which are solved by *multiple different vendors*), product/module/framework-control overlap, redundant licenses, and capabilities that were purchased (an edition's module) but never enabled. From these it calculates an overlap %, an optimization score (blending redundancy with the Gap Engine's own gap %), a vendor consolidation score, a license reduction opportunity, a cost optimization score, and an operational complexity score. It also cross-references the Recommendation Engine's product comparison so an overlapping vendor that also helps close open gaps reads as a "keep" candidate rather than a pure duplicate. Reports are exportable as JSON, Excel, or PDF, and a dedicated Overlap page (executive summary, vendor comparison, an overlap matrix, a capability heatmap, duplicate products, and optimization opportunities, with a filterable/sortable/searchable duplicate-capability table) is linked from every Assessment Project. Builds on Sprint 9's Recommendation Engine, Sprint 8's Gap Analysis Engine, Sprint 7's Coverage Analysis Engine, and Sprint 5's `ProductCapabilityMapping` fact table. The Simulation Engine and AI Assistant are still not implemented.
 
 ## Monorepo Structure
 
@@ -18,9 +18,9 @@ backend/    FastAPI + SQLModel + Alembic service, PostgreSQL-backed
   app/services/     Business rules (uniqueness, referential checks, bulk ops)
   app/api/routes/   FastAPI routers (thin controllers)
   app/knowledge/    YAML knowledge base + importer/exporter (see below)
-  app/engine/       Analysis engines — coverage_engine.py, gap_engine.py, and
-                    recommendation_engine.py implemented (Sprints 7-9); overlap/simulation/cost
-                    engines still placeholders
+  app/engine/       Analysis engines — coverage_engine.py, gap_engine.py, recommendation_engine.py,
+                    and overlap_engine.py implemented (Sprints 7-10); simulation/cost engines
+                    still placeholders
   tests/            pytest suite (importer, validation, API, engine unit/perf tests)
 frontend/   Next.js 15 + TypeScript + Tailwind CSS + shadcn/ui dashboard
   src/app/(dashboard)/knowledge-base/    Knowledge Base pages (vendors, products, ...)
@@ -29,12 +29,13 @@ frontend/   Next.js 15 + TypeScript + Tailwind CSS + shadcn/ui dashboard
                                           assignments, import/export)
   src/app/(dashboard)/assessments/[id]/gaps/            Dedicated Gap Analysis page
   src/app/(dashboard)/assessments/[id]/recommendations/ Dedicated Recommendations page
+  src/app/(dashboard)/assessments/[id]/overlap/         Dedicated Overlap & Optimization page
   src/components/knowledge-base/         Config-driven CRUD table/form/detail components
   src/components/customers/              Customer detail + business unit/environment/assessment dialogs
   src/components/assessments/            Assessment project page, product assignment wizard, coverage
-                                          analysis section, the Gap Analysis page, and the
-                                          Recommendations page (forecast, priority matrix, product
-                                          comparison, recommendation table with filters/search/sort)
+                                          analysis section, the Gap Analysis page, the Recommendations
+                                          page, and the Overlap page (vendor comparison, overlap
+                                          matrix, capability heatmap, duplicate products)
 docs/       Product blueprint and architecture documentation
 ```
 
@@ -185,6 +186,31 @@ A `RecommendationReport` exports as **JSON**, **Excel** (Summary / Priority Matr
 
 A dedicated **Recommendations** page (`/assessments/{id}/recommendations`, linked from the Assessment Project page) shows an executive summary (estimated risk reduction, addressable/unaddressable counts, priority counts), a coverage improvement forecast bar, a Top Recommendations card grid (Critical/High priority), a priority-matrix bar chart, a product comparison table, and a full recommendation table with search, priority/domain filters, and sortable columns — plus the JSON/Excel/PDF export buttons.
 
+## Overlap & Optimization Engine
+
+`OverlapEngine` (`backend/app/engine/overlap_engine.py`) closes out the analysis suite. It looks across an assessment's *Deployed* product assignments for redundancy and consolidation opportunities — **deterministic rule-based detection only, no AI reasoning**. It reuses `CoverageEngine` for the covered-capability baseline, `GapEngine`'s overall gap % as an input to the optimization score, and `RecommendationEngine`'s product comparison to note which overlapping vendors also help close open gaps.
+
+It detects:
+
+- **Duplicate capabilities** — a capability provided by more than one deployed product, flagged `cross_vendor` when two or more *different* vendors solve the identical problem (the most actionable, most expensive kind of redundancy) versus the same vendor covering it twice across different products.
+- **Product overlap** and **module overlap** — pairwise shared-capability counts between every pair of deployed products, and separately between every pair of enabled modules, for a finer-grained view.
+- **Framework overlap** — compliance controls redundantly satisfied by more than one deployed product.
+- **Redundant licenses** — deployed assignments whose capabilities are wholly (`fully_redundant`) or partially also provided elsewhere; fully-redundant assignments' license quantities sum into the license reduction opportunity.
+- **Unused capabilities** — capabilities available under a deployed edition (via a module that could be enabled) but never actually turned on in the assignment — directly answering "which capabilities were purchased but never enabled?" from the platform's founding problem statement.
+
+From these it calculates:
+
+- **Overlap %** — duplicate capabilities ÷ covered capabilities.
+- **Optimization score** (0-100, higher is better) — `100 - (overlap % + gap %) / 2`: a well-optimized deployment has neither redundancy nor gaps.
+- **Vendor consolidation score** — the share of deployed vendors implicated in a cross-vendor duplicate.
+- **License reduction opportunity** — total license quantity attributable to fully-redundant assignments.
+- **Cost optimization score** — that redundant quantity as a percentage of total deployed license quantity (a real, knowledge-base-grounded proxy — no fabricated dollar figures, since pricing isn't in the catalog).
+- **Operational complexity score** — from vendor count, product count, and deployment-model diversity.
+
+An `OverlapReport` exports as **JSON**, **Excel** (Summary / Vendor Comparison / Duplicate Capabilities / Product Overlap / Redundant Licenses / Unused Capabilities sheets), or **PDF** via `GET /analysis/overlap/export?assessment_id=&format=`.
+
+A dedicated **Overlap** page (`/assessments/{id}/overlap`, linked from the Assessment Project page) shows an executive summary of every score above, duplicate-capabilities-by-domain and unique-vs-overlapping-by-vendor charts, a domain capability heatmap, a vendor comparison table, a product-by-product overlap matrix, a duplicate-products (license reduction) table, an unused-capabilities table, and a searchable/filterable/sortable duplicate-capability table.
+
 ## Backend APIs
 
 Full CRUD + search + pagination is available for every knowledge base entity, documented in Swagger at `/docs`:
@@ -270,6 +296,15 @@ GET  /analysis/recommendations/export?assessment_id=     ?format=json|excel|pdf 
 GET  /analysis/recommendations/summary?assessment_id=    executive summary only (no recommendation/matrix/comparison lists)
 ```
 
+The Overlap & Optimization Engine adds:
+
+```
+POST /analysis/overlap                          body: {"assessment_project_id": <id>} -> OverlapReport
+GET  /analysis/overlap/{assessment_id}           the same OverlapReport, by id
+GET  /analysis/overlap/export?assessment_id=     ?format=json|excel|pdf -> file download
+GET  /analysis/overlap/summary?assessment_id=    executive summary only (no vendor/matrix/product/license/unused lists)
+```
+
 ## Local Development
 
 ### Backend
@@ -313,6 +348,8 @@ The Knowledge Base pages live under **Knowledge Base** in the sidebar (`/knowled
 The **Gap Analysis** button on the Assessment Project page opens `/assessments/{id}/gaps`: an executive summary, a Critical Gap card grid, gaps-by-severity and gaps-by-domain bar charts, a domain risk heatmap, a severity × business-impact risk matrix, and a gap table with search, severity/domain filters, sortable columns, and JSON/Excel/PDF export.
 
 The **Recommendations** button opens `/assessments/{id}/recommendations`: an executive summary (estimated risk reduction, priority counts), a coverage improvement forecast bar, a Top Recommendations card grid, a priority-matrix bar chart, a product comparison table, and a recommendation table with search, priority/domain filters, sortable columns, and JSON/Excel/PDF export.
+
+The **Overlap** button opens `/assessments/{id}/overlap`: an executive summary of every optimization score, duplicate-capabilities-by-domain and unique-vs-overlapping-by-vendor charts, a domain capability heatmap, a vendor comparison table, a product-by-product overlap matrix, a duplicate-products (license reduction) table, an unused-capabilities table, and a duplicate-capability table with search, domain/cross-vendor filters, sortable columns, and JSON/Excel/PDF export.
 
 ## Makefile Reference
 

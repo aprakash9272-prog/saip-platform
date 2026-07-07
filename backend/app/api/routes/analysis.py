@@ -11,6 +11,12 @@ from app.engine.coverage_export import (
 )
 from app.engine.gap_engine import GapEngine
 from app.engine.gap_export import export_gap_excel, export_gap_json, export_gap_pdf
+from app.engine.overlap_engine import OverlapEngine
+from app.engine.overlap_export import (
+    export_overlap_excel,
+    export_overlap_json,
+    export_overlap_pdf,
+)
 from app.engine.recommendation_engine import RecommendationEngine
 from app.engine.recommendation_export import (
     export_recommendation_excel,
@@ -24,6 +30,7 @@ from app.schemas.coverage import (
     DomainCoverage,
 )
 from app.schemas.gap import DomainGapScore, GapReport, GapRequest, GapSummary
+from app.schemas.overlap import OverlapReport, OverlapRequest, OverlapSummary
 from app.schemas.recommendation import (
     RecommendationReport,
     RecommendationRequest,
@@ -234,3 +241,74 @@ def recommendation_summary(assessment_id: int, session: SessionDep):
 )
 def get_recommendations(assessment_id: int, session: SessionDep):
     return RecommendationEngine(session).calculate(assessment_id)
+
+
+# ------------------------------------------------------------------ Overlap --
+# Static sibling paths (export/summary) must be registered before the dynamic
+# /overlap/{assessment_id} route below, same reasoning as /gaps above.
+
+
+@router.post(
+    "/overlap",
+    response_model=OverlapReport,
+    summary="Calculate the overlap & optimization report for an assessment project",
+)
+def calculate_overlap(payload: OverlapRequest, session: SessionDep):
+    return OverlapEngine(session).calculate(payload.assessment_project_id)
+
+
+@router.get(
+    "/overlap/export",
+    summary="Export the overlap report as JSON, Excel, or PDF",
+)
+def export_overlap(
+    session: SessionDep,
+    assessment_id: int,
+    format: str = Query("json", pattern="^(json|excel|pdf)$"),
+):
+    report = OverlapEngine(session).calculate(assessment_id)
+    if format == "excel":
+        content = export_overlap_excel(report)
+    elif format == "pdf":
+        content = export_overlap_pdf(report)
+    else:
+        content = export_overlap_json(report)
+
+    filename = f"overlap-{assessment_id}.{_EXPORT_EXTENSIONS[format]}"
+    return Response(
+        content=content,
+        media_type=_EXPORT_MEDIA_TYPES[format],
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+    )
+
+
+@router.get(
+    "/overlap/summary",
+    response_model=OverlapSummary,
+    summary="Executive summary of the overlap report for an assessment project",
+)
+def overlap_summary(assessment_id: int, session: SessionDep):
+    report = OverlapEngine(session).calculate(assessment_id)
+    return OverlapSummary(
+        **report.model_dump(
+            exclude={
+                "domain_overlap_scores",
+                "duplicate_capabilities",
+                "product_overlaps",
+                "module_overlaps",
+                "framework_overlaps",
+                "redundant_licenses",
+                "unused_capabilities",
+                "vendor_summary",
+            }
+        )
+    )
+
+
+@router.get(
+    "/overlap/{assessment_id}",
+    response_model=OverlapReport,
+    summary="Get the overlap & optimization report for an assessment project",
+)
+def get_overlap(assessment_id: int, session: SessionDep):
+    return OverlapEngine(session).calculate(assessment_id)

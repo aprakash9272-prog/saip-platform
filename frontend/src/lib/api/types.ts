@@ -578,3 +578,118 @@ export interface RecommendationReport extends RecommendationSummary {
 }
 
 export type RecommendationExportFormat = "json" | "excel" | "pdf";
+
+// ------------------------------------------------- Overlap & Optimization --
+
+export interface DuplicateCapabilityOverlap {
+  id: number;
+  code: string;
+  name: string;
+  domain_id: number;
+  domain_name: string;
+  provider_count: number;
+  distinct_vendor_count: number;
+  providers: string[];
+  cross_vendor: boolean;
+}
+
+export interface ProductOverlapPair {
+  vendor_a: string;
+  product_a: string;
+  vendor_b: string;
+  product_b: string;
+  shared_capability_count: number;
+  shared_capability_codes: string[];
+  overlap_percentage: number;
+}
+
+export interface ModuleOverlapPair {
+  vendor_a: string;
+  product_a: string;
+  module_a: string;
+  vendor_b: string;
+  product_b: string;
+  module_b: string;
+  shared_capability_count: number;
+  shared_capability_codes: string[];
+}
+
+export interface FrameworkOverlapItem {
+  framework_name: string;
+  framework_version: string;
+  control_id: string;
+  control_name: string;
+  provider_count: number;
+  providers: string[];
+}
+
+export interface RedundantLicenseItem {
+  assignment_id: number;
+  vendor: string;
+  product: string;
+  edition: string;
+  license_quantity: number | null;
+  redundant_capability_count: number;
+  total_capability_count: number;
+  redundancy_percentage: number;
+  fully_redundant: boolean;
+}
+
+export interface UnusedCapabilityItem {
+  assignment_id: number;
+  vendor: string;
+  product: string;
+  edition: string;
+  module: string;
+  capability_code: string;
+  capability_name: string;
+  domain_name: string;
+}
+
+export interface VendorOverlapSummary {
+  vendor: string;
+  deployed_product_count: number;
+  total_capabilities_provided: number;
+  unique_capabilities_provided: number;
+  overlapping_capabilities_provided: number;
+  total_license_quantity: number;
+  open_gaps_addressable: number;
+}
+
+export interface DomainOverlapScore {
+  domain_id: number;
+  domain_name: string;
+  covered_count: number;
+  duplicate_count: number;
+  overlap_percentage: number;
+}
+
+export interface OverlapSummary {
+  assessment_project_id: number;
+  assessment_project_name: string;
+  generated_at: string;
+  total_deployed_products: number;
+  total_vendors: number;
+  duplicate_capability_count: number;
+  cross_vendor_duplicate_count: number;
+  unused_capability_count: number;
+  overlap_percentage: number;
+  optimization_score: number;
+  vendor_consolidation_score: number;
+  license_reduction_opportunity: number;
+  cost_optimization_score: number;
+  operational_complexity_score: number;
+}
+
+export interface OverlapReport extends OverlapSummary {
+  domain_overlap_scores: DomainOverlapScore[];
+  duplicate_capabilities: DuplicateCapabilityOverlap[];
+  product_overlaps: ProductOverlapPair[];
+  module_overlaps: ModuleOverlapPair[];
+  framework_overlaps: FrameworkOverlapItem[];
+  redundant_licenses: RedundantLicenseItem[];
+  unused_capabilities: UnusedCapabilityItem[];
+  vendor_summary: VendorOverlapSummary[];
+}
+
+export type OverlapExportFormat = "json" | "excel" | "pdf";

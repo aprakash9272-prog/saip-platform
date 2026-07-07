@@ -47,6 +47,19 @@ from app.schemas.gap import (
     GapSummary,
 )
 from app.schemas.module import ModuleCreate, ModuleRead, ModuleUpdate
+from app.schemas.overlap import (
+    DomainOverlapScore,
+    DuplicateCapabilityOverlap,
+    FrameworkOverlapItem,
+    ModuleOverlapPair,
+    OverlapReport,
+    OverlapRequest,
+    OverlapSummary,
+    ProductOverlapPair,
+    RedundantLicenseItem,
+    UnusedCapabilityItem,
+    VendorOverlapSummary,
+)
 from app.schemas.product import ProductCreate, ProductRead, ProductUpdate
 from app.schemas.product_assignment import (
     ProductAssignmentCreate,
@@ -144,4 +157,15 @@ __all__ = [
     "CoverageForecast",
     "RecommendationSummary",
     "RecommendationReport",
+    "OverlapRequest",
+    "DuplicateCapabilityOverlap",
+    "ProductOverlapPair",
+    "ModuleOverlapPair",
+    "FrameworkOverlapItem",
+    "RedundantLicenseItem",
+    "UnusedCapabilityItem",
+    "VendorOverlapSummary",
+    "DomainOverlapScore",
+    "OverlapSummary",
+    "OverlapReport",
 ]

@@ -6,6 +6,7 @@ import {
   Building2,
   Download,
   Layers,
+  Layers3,
   Lightbulb,
   Package,
   Pencil,
@@ -298,6 +299,11 @@ export function AssessmentProjectPage({ projectId }: AssessmentProjectPageProps)
           <Button asChild variant="outline">
             <Link href={`/assessments/${projectId}/recommendations`}>
               <Lightbulb className="size-4" /> Recommendations
+            </Link>
+          </Button>
+          <Button asChild variant="outline">
+            <Link href={`/assessments/${projectId}/overlap`}>
+              <Layers3 className="size-4" /> Overlap
             </Link>
           </Button>
           <Button variant="outline" onClick={() => setProjectFormOpen(true)}>

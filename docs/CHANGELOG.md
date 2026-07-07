@@ -2,6 +2,21 @@
 
 All notable changes to this project are documented in this file.
 
+## [v0.9.0-alpha] — 2026-07-07 — Security Overlap & Optimization Engine
+
+### Added
+- `OverlapEngine` (`app/engine/overlap_engine.py`), built on top of the Coverage, Gap, and Recommendation Engines: identifies redundancy and consolidation opportunities across an assessment's deployed products. Fully deterministic, rule-based detection — no AI reasoning.
+- Duplicate capability detection, specifically flagging `cross_vendor` duplicates (the same capability solved by two or more *different* vendors) separately from same-vendor duplication across products.
+- Product overlap and module overlap: pairwise shared-capability counts between every pair of deployed products, and separately between every pair of enabled modules.
+- Framework overlap: compliance controls redundantly satisfied by more than one deployed product.
+- Redundant license detection: deployed assignments whose capabilities are wholly (`fully_redundant`) or partially covered elsewhere; fully-redundant license quantities sum into the license reduction opportunity.
+- Unused capability detection: capabilities available under a deployed edition (via a module that could be enabled) but never actually turned on — answers "which capabilities were purchased but never enabled?" directly from the platform's founding problem statement.
+- Calculated scores: overlap % (duplicates ÷ covered capabilities), an optimization score (blending overlap % with the Gap Engine's gap %), a vendor consolidation score, a license reduction opportunity, a cost optimization score (redundant license quantity as a % of total — no fabricated dollar figures), and an operational complexity score (from vendor/product/deployment-model diversity).
+- Vendor comparison cross-references the Recommendation Engine's product comparison, so a vendor that overlaps but also addresses open gaps reads as a genuine "keep" candidate rather than a pure duplicate.
+- `POST /analysis/overlap`, `GET /analysis/overlap/{assessment_id}`, `GET /analysis/overlap/export` (JSON/Excel/PDF), `GET /analysis/overlap/summary`, documented in Swagger.
+- A dedicated Overlap page (`/assessments/{id}/overlap`, linked from the Assessment Project page): executive summary of every score, duplicate-capabilities-by-domain and unique-vs-overlapping-by-vendor charts, a domain capability heatmap, a vendor comparison table, a product-by-product overlap matrix, a duplicate-products (license reduction) table, an unused-capabilities table, and a duplicate-capability table with search, domain/cross-vendor filters, and sortable columns.
+- Unit tests for duplicate/cross-vendor detection, module/framework overlap, redundant-license and unused-capability detection, and score bounds; API integration tests for all four endpoints and every export format (plus a route-ordering regression guard); and a performance test reusing the Sprint 8 bulk-catalog fixture (191 backend tests total, all passing).
+
 ## [v0.8.0-alpha] — 2026-07-07 — Security Recommendation Engine
 
 ### Added
